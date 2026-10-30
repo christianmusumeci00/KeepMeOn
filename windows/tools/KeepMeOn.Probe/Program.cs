@@ -108,15 +108,35 @@ namespace KeepMeOn.Probe
             form.Location = new Point(40, 40);
             form.Show();
             Pump();
-            using (var bitmap = new Bitmap(form.Width, form.Height))
-            {
-                form.DrawToBitmap(bitmap, new Rectangle(Point.Empty, form.Size));
-                bitmap.Save(Path.Combine(folder, name + ".png"), ImageFormat.Png);
-            }
-            SaveScreen(form.Bounds, folder, name + "-schermo");
-            Console.WriteLine($"{name}: {form.Width}×{form.Height}");
+            Rectangle visible = VisibleBounds(form);
+            SaveScreen(visible, folder, name);
+            Console.WriteLine($"{name}: {visible.Width}×{visible.Height}");
             form.Close();
         }
+
+        /// <summary>
+        /// Area davvero visibile della finestra: Windows 10 e 11 aggiungono bordi invisibili
+        /// per il ridimensionamento, che in una cattura mostrerebbero lo sfondo.
+        /// </summary>
+        private static Rectangle VisibleBounds(Form form)
+        {
+            const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
+            return DwmGetWindowAttribute(form.Handle, DWMWA_EXTENDED_FRAME_BOUNDS, out RECT rect, Marshal.SizeOf(typeof(RECT))) == 0
+                ? Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom)
+                : form.Bounds;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out RECT value, int size);
 
         /// <summary>Cattura una zona dello schermo: mostra la finestra come la vede l'utente, ombre e temi compresi.</summary>
         private static void SaveScreen(Rectangle bounds, string folder, string name)

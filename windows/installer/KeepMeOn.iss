@@ -4,7 +4,7 @@
 
 #define AppName "KeepMeOn"
 ; Da tenere allineata a <Version> in windows\src\KeepMeOn\KeepMeOn.csproj.
-#define AppVersion "1.0.0"
+#define AppVersion "1.1.0"
 #define AppExe "KeepMeOn.exe"
 #define BuildDir "..\src\KeepMeOn\bin\Release\net48"
 
