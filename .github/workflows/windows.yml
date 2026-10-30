@@ -1,0 +1,57 @@
+# Compila e verifica KeepMeOn per Windows su un computer Windows di GitHub:
+# test della logica, verifica del segnale neutro, immagini delle finestre e installer.
+name: Windows
+
+on:
+  push:
+    paths:
+      - 'windows/**'
+      - '.github/workflows/windows.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Test della logica
+        run: dotnet test windows/tests/KeepMeOn.Core.Tests -c Release
+
+      - name: Compilazione
+        run: |
+          dotnet build windows/src/KeepMeOn -c Release
+          dotnet build windows/tools/KeepMeOn.Probe -c Release
+
+      - name: Verifica del segnale neutro
+        run: |
+          New-Item -ItemType Directory -Force windows/dist | Out-Null
+          windows/tools/KeepMeOn.Probe/bin/Release/net48/KeepMeOn.Probe.exe input | Tee-Object windows/dist/verifica-segnale.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Immagini delle finestre
+        run: windows/tools/KeepMeOn.Probe/bin/Release/net48/KeepMeOn.Probe.exe snapshots windows/dist/immagini
+
+      - name: Installer
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup --no-progress -y }
+          & $iscc windows/installer/KeepMeOn.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: KeepMeOn-Windows
+          path: |
+            windows/dist/KeepMeOn-Setup.exe
+            windows/dist/verifica-segnale.txt
+            windows/dist/immagini/

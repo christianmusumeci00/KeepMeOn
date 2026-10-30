@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Logica pura (orari, pausa pranzo, stato): nessuna dipendenza da Windows, testabile ovunque.
+       L'app la include come sorgente, così resta un solo eseguibile. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>KeepMeOn.Core</RootNamespace>
+  </PropertyGroup>
+
+</Project>
