@@ -55,18 +55,7 @@ Se ti allontani a lungo, blocca il Mac con **⌃⌘Q**: KeepMeOn si mette in pau
 
 1. Scarica **[KeepMeOn.dmg](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn.dmg)** dalla pagina [Release](https://github.com/christianmusumeci00/KeepMeOn/releases).
 2. Apri il DMG e trascina **KeepMeOn** nella cartella **Applicazioni**.
-3. **Primo avvio.** L'app non è notarizzata da Apple, quindi la prima volta macOS la blocca. Fallo una sola volta:
-   - **macOS 15 Sequoia e successivi:**
-     1. Apri KeepMeOn e chiudi l'avviso.
-     2. Vai in Impostazioni di Sistema › Privacy e sicurezza.
-     3. In fondo alla pagina premi **Apri comunque** accanto a KeepMeOn, poi conferma.
-   - **macOS 13 Ventura e 14 Sonoma:** fai clic destro (o Ctrl-clic) su KeepMeOn in Applicazioni › **Apri** › **Apri**.
-   - **In alternativa, da Terminale:**
-
-     ```bash
-     xattr -dr com.apple.quarantine /Applications/KeepMeOn.app
-     ```
-
+3. Apri **KeepMeOn** da Applicazioni o da Spotlight. L'app è firmata con un certificato Developer ID e notarizzata da Apple, quindi si apre con un doppio clic. Visto che arriva da Internet, macOS chiede una sola conferma: premi **Apri**.
 4. **Permesso di Accessibilità.**
    1. Nella schermata di benvenuto premi **Apri Impostazioni Accessibilità** e attiva **KeepMeOn** nell'elenco.
    2. L'app si riavvia da sola: macOS applica questo permesso solo all'avvio.
@@ -150,7 +139,7 @@ cd KeepMeOn
 |---|---|
 | `./build.sh` | `dist/KeepMeOn.app` per l'architettura del tuo Mac |
 | `UNIVERSAL=1 ./build.sh` | `dist/KeepMeOn.app` universale (Apple Silicon e Intel) |
-| `./make-dmg.sh` | `dist/KeepMeOn.dmg` universale, con il collegamento ad Applicazioni |
+| `./make-dmg.sh` | `dist/KeepMeOn.dmg` universale, con il collegamento ad Applicazioni (notarizzato se ci sono certificato e credenziali, vedi sotto) |
 | `swift test` | test della logica (orari, pausa pranzo, stato, soglia) |
 
 Poi avvia l'app:
@@ -159,15 +148,27 @@ Poi avvia l'app:
 open dist/KeepMeOn.app
 ```
 
-**Firma.**
-- Se nel portachiavi c'è un certificato "Apple Development", `build.sh` lo usa da solo: macOS riconosce l'app dal certificato e il permesso di Accessibilità resta valido anche dopo una nuova build.
-- Altrimenti firma ad-hoc, e in quel caso il permesso va ridato dopo ogni build.
-- Per scegliere la firma a mano:
+**Firma.** `build.sh` sceglie da solo il certificato nel portachiavi, in quest'ordine:
+1. "Developer ID Application": per distribuire. Firma con runtime protetto e marca temporale, come richiede la notarizzazione.
+2. "Apple Development": per l'uso sul proprio Mac.
+3. Se non trova nessuno dei due, firma ad-hoc.
+
+Con un certificato macOS riconosce l'app da chi l'ha firmata, quindi il permesso di Accessibilità resta valido anche dopo una nuova build. Con la firma ad-hoc il permesso va ridato dopo ogni build.
+
+Per scegliere la firma a mano:
 
   ```bash
   SIGN_IDENTITY=- ./build.sh                     # forza la firma ad-hoc
   SIGN_IDENTITY="Nome del certificato" ./build.sh
   ```
+
+**Notarizzazione.** Con un certificato Developer ID, `make-dmg.sh` fa notarizzare da Apple prima l'app e poi il DMG. Poi allega a entrambi il ticket di notarizzazione e controlla che macOS li accetti. Prima salva le credenziali, una volta sola: ti verrà chiesta una [password per le app](https://support.apple.com/it-it/102654) del tuo ID Apple.
+
+```bash
+xcrun notarytool store-credentials "KeepMeOn" --apple-id "il-tuo-id-apple" --team-id "IL_TUO_TEAM_ID"
+```
+
+Senza credenziali il DMG viene comunque creato e firmato, ma non notarizzato.
 
 **Icona.** È disegnata in codice. Per rigenerarla:
 
@@ -213,7 +214,6 @@ Può essere nascosta da un gestore della barra (Bartender, Ice, Thaw…) o dalla
 - Con lo schermo bloccato o il Mac in stop Teams va comunque in «Assente». È voluto.
 - Lo stato impostato a mano in Teams, le riunioni e il calendario restano gestiti da Teams.
 - Se Microsoft cambia il modo in cui Teams misura l'inattività, il comportamento potrebbe cambiare.
-- L'app non è notarizzata: al primo avvio serve il passaggio "Apri comunque" descritto in [Installazione](#installazione).
 - Se il Mac è gestito dall'azienda, verifica che l'uso sia consentito. Per un controllo IT l'app resta visibile: processo attivo, elenco Accessibilità, elementi di login.
 
 ## Disinstallazione
@@ -232,7 +232,7 @@ Può essere nascosta da un gestore della barra (Bartender, Ice, Thaw…) o dalla
 ```
 KeepMeOn/
 ├── build.sh                    compila, assembla il bundle e lo firma
-├── make-dmg.sh                 crea il DMG universale
+├── make-dmg.sh                 crea il DMG universale e lo fa notarizzare
 ├── Package.swift
 ├── Support/
 │   ├── Info.plist              bundle id, LSUIElement, versione, icona

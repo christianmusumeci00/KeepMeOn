@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Compila KeepMeOn in release, assembla dist/KeepMeOn.app e lo firma.
 #
-# Firma: se nel portachiavi c'è un certificato "Apple Development" usa quello, così il
-# permesso di Accessibilità resta valido tra una build e l'altra; altrimenti firma ad-hoc
-# (macOS chiederà di nuovo il permesso dopo ogni build).
+# Firma, in ordine di preferenza, con un certificato del portachiavi:
+#   1. "Developer ID Application": per distribuire (runtime protetto e marca temporale,
+#      richiesti dalla notarizzazione di make-dmg.sh);
+#   2. "Apple Development": per uso locale.
+# Con un certificato il permesso di Accessibilità resta valido tra una build e l'altra.
+# Senza, firma ad-hoc e macOS chiederà di nuovo il permesso dopo ogni build.
 #   SIGN_IDENTITY=- ./build.sh            forza la firma ad-hoc
 #   SIGN_IDENTITY="<nome o impronta>" ./build.sh   usa un certificato preciso
 #   UNIVERSAL=1 ./build.sh                app universale (Apple Silicon e Intel)
@@ -17,7 +20,11 @@ APP="$DIST_DIR/$APP_NAME.app"
 PLIST="Support/Info.plist"
 
 if [ -z "${SIGN_IDENTITY:-}" ]; then
-    DEV_LINE="$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 '"Apple Development:' || true)"
+    IDENTITIES="$(security find-identity -v -p codesigning 2>/dev/null || true)"
+    DEV_LINE="$(echo "$IDENTITIES" | grep -m1 '"Developer ID Application:' || true)"
+    if [ -z "$DEV_LINE" ]; then
+        DEV_LINE="$(echo "$IDENTITIES" | grep -m1 '"Apple Development:' || true)"
+    fi
     if [ -n "$DEV_LINE" ]; then
         # L'impronta SHA-1 evita ambiguità se esistono più certificati con lo stesso nome.
         SIGN_IDENTITY="$(echo "$DEV_LINE" | awk '{print $2}')"
@@ -52,12 +59,18 @@ cp Support/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 plutil -lint "$APP/Contents/Info.plist" > /dev/null
 
+SIGN_FLAGS=(--force --sign "$SIGN_IDENTITY")
+case "$SIGN_LABEL" in
+    "Developer ID Application:"*) SIGN_FLAGS+=(--options runtime --timestamp) ;;
+    *) SIGN_FLAGS+=(--timestamp=none) ;;
+esac
+
 if [ "$SIGN_IDENTITY" = "-" ]; then
     echo "▸ Firma ad-hoc (il permesso di Accessibilità andrà ridato dopo ogni build)…"
 else
     echo "▸ Firma con \"$SIGN_LABEL\"…"
 fi
-codesign --force --sign "$SIGN_IDENTITY" --timestamp=none "$APP"
+codesign "${SIGN_FLAGS[@]}" "$APP"
 codesign --verify --strict "$APP"
 
 echo "✓ Pronto: $APP"
