@@ -9,82 +9,98 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Toggle("Solo in orario di lavoro", isOn: $controller.workHoursOnly)
-
-            Group {
-                DatePicker("Inizio:", selection: time(\.workHours.startMinute), displayedComponents: .hourAndMinute)
-                DatePicker("Fine:", selection: time(\.workHours.endMinute), displayedComponents: .hourAndMinute)
-                LabeledContent("Giorni:") {
-                    HStack(spacing: 10) {
-                        ForEach(WorkHours.mondayFirst, id: \.self) { day in
-                            Toggle(WorkHours.shortName(of: day).capitalized, isOn: isSelected(day))
-                                .toggleStyle(.checkbox)
-                        }
-                    }
-                    .fixedSize()
-                }
-            }
-            .disabled(!controller.workHoursOnly)
-
-            note(workHoursNote)
+            WorkHoursFields(controller: controller)
+                .disabled(!controller.workHoursOnly)
+            Note(text: controller.workHoursNote)
 
             Divider()
                 .padding(.vertical, 6)
 
             Toggle("Pausa pranzo", isOn: $controller.lunchBreakEnabled)
-
-            Group {
-                DatePicker("Dalle:", selection: time(\.lunchBreak.startMinute), displayedComponents: .hourAndMinute)
-                DatePicker("Alle:", selection: time(\.lunchBreak.endMinute), displayedComponents: .hourAndMinute)
-            }
-            .disabled(!controller.lunchBreakEnabled)
-
-            note("Durante la pausa pranzo KeepMeOn non interviene, tutti i giorni.")
+            LunchBreakFields(controller: controller)
+                .disabled(!controller.lunchBreakEnabled)
+            Note(text: "Durante la pausa pranzo KeepMeOn non interviene, tutti i giorni.")
         }
         .formStyle(.columns)
         .padding(20)
         .frame(width: 500)
     }
+}
 
-    private func note(_ text: String) -> some View {
+/// Ora di inizio, ora di fine e giorni: nella finestra degli orari e nella configurazione guidata.
+struct WorkHoursFields: View {
+    @ObservedObject var controller: KeeperController
+
+    var body: some View {
+        DatePicker("Inizio:", selection: controller.timeBinding(\.workHours.startMinute), displayedComponents: .hourAndMinute)
+        DatePicker("Fine:", selection: controller.timeBinding(\.workHours.endMinute), displayedComponents: .hourAndMinute)
+        LabeledContent("Giorni:") {
+            HStack(spacing: 10) {
+                ForEach(WorkHours.mondayFirst, id: \.self) { day in
+                    Toggle(WorkHours.shortName(of: day).capitalized, isOn: controller.weekdayBinding(day))
+                        .toggleStyle(.checkbox)
+                }
+            }
+            .fixedSize()
+        }
+    }
+}
+
+/// Inizio e fine della pausa pranzo.
+struct LunchBreakFields: View {
+    @ObservedObject var controller: KeeperController
+
+    var body: some View {
+        DatePicker("Dalle:", selection: controller.timeBinding(\.lunchBreak.startMinute), displayedComponents: .hourAndMinute)
+        DatePicker("Alle:", selection: controller.timeBinding(\.lunchBreak.endMinute), displayedComponents: .hourAndMinute)
+    }
+}
+
+/// Testo secondario sotto un gruppo di controlli.
+struct Note: View {
+    let text: String
+
+    var body: some View {
         Text(text)
             .font(.callout)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
     }
+}
 
-    private var workHoursNote: String {
+extension KeeperController {
+    var workHoursNote: String {
         var lines = ["Fuori fascia KeepMeOn resta acceso ma non interviene."]
-        let hours = controller.workHours
-        if hours.startMinute == hours.endMinute {
+        if workHours.startMinute == workHours.endMinute {
             lines.append("Inizio e fine coincidono: la fascia copre l'intera giornata.")
-        } else if hours.startMinute > hours.endMinute {
+        } else if workHours.startMinute > workHours.endMinute {
             lines.append("La fascia termina il giorno dopo, come un turno di notte.")
         }
         return lines.joined(separator: " ")
     }
 
     /// Collega un orario in minuti dalla mezzanotte a un `DatePicker`.
-    private func time(_ keyPath: ReferenceWritableKeyPath<KeeperController, Int>) -> Binding<Date> {
+    func timeBinding(_ keyPath: ReferenceWritableKeyPath<KeeperController, Int>) -> Binding<Date> {
         Binding(
             get: {
-                let minute = controller[keyPath: keyPath]
+                let minute = self[keyPath: keyPath]
                 return Calendar.current.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: Date()) ?? Date()
             },
             set: { date in
                 let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
-                controller[keyPath: keyPath] = (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
+                self[keyPath: keyPath] = (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
             }
         )
     }
 
-    private func isSelected(_ weekday: Int) -> Binding<Bool> {
+    func weekdayBinding(_ weekday: Int) -> Binding<Bool> {
         Binding(
-            get: { controller.workHours.weekdays.contains(weekday) },
+            get: { self.workHours.weekdays.contains(weekday) },
             set: { selected in
                 if selected {
-                    controller.workHours.weekdays.insert(weekday)
+                    self.workHours.weekdays.insert(weekday)
                 } else {
-                    controller.workHours.weekdays.remove(weekday)
+                    self.workHours.weekdays.remove(weekday)
                 }
             }
         )

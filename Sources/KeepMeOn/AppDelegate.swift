@@ -11,7 +11,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             andEventID: AEEventID(kAEReopenApplication)
         )
 
-        WelcomeWindow.shared.showIfNeeded(controller: .shared, loginItem: .shared)
+        OnboardingWindow.shared.showIfNeeded(controller: .shared, loginItem: .shared, updater: .shared)
+        Updater.shared.start()
     }
 
     /// Riaprire l'app già in esecuzione (Spotlight, Finder, `open`) fa ricomparire l'icona.

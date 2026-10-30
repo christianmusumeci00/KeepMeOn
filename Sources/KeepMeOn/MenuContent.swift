@@ -6,6 +6,7 @@ import SwiftUI
 struct MenuContent: View {
     @ObservedObject var controller: KeeperController
     @ObservedObject var loginItem: LoginItem
+    @ObservedObject var updater: Updater
 
     var body: some View {
         Text(statusText)
@@ -51,9 +52,18 @@ struct MenuContent: View {
         Button("Nascondi icona…") {
             MenuBarIcon.confirmHide()
         }
-        Button("Come funziona…") {
-            WelcomeWindow.shared.show(controller: controller, loginItem: loginItem)
+        Button("Configurazione guidata…") {
+            OnboardingWindow.shared.show(controller: controller, loginItem: loginItem, updater: updater, fromStart: true)
         }
+
+        Divider()
+
+        Button(updater.isBusy ? "Controllo aggiornamenti in corso…" : "Controlla aggiornamenti…") {
+            updater.checkNow()
+        }
+        .disabled(updater.isBusy)
+        Toggle("Aggiornamenti automatici", isOn: $updater.automaticChecks)
+        Text("KeepMeOn \(updater.currentVersion.description)")
 
         Divider()
 

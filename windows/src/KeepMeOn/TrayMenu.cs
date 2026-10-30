@@ -8,6 +8,7 @@ namespace KeepMeOn
     internal sealed class TrayMenu : IDisposable
     {
         private readonly KeeperController controller;
+        private readonly Updater updater;
         private readonly ToolStripMenuItem status = Info();
         private readonly ToolStripMenuItem lastIntervention = Info();
         private readonly ToolStripMenuItem enabled = new ToolStripMenuItem("Attivo");
@@ -17,10 +18,14 @@ namespace KeepMeOn
         private readonly ToolStripMenuItem lunchBreak = new ToolStripMenuItem("Pausa pranzo");
         private readonly ToolStripMenuItem lunchSummary = Info();
         private readonly ToolStripMenuItem startup = new ToolStripMenuItem("Avvia all'accesso a Windows");
+        private readonly ToolStripMenuItem checkUpdates = new ToolStripMenuItem("Controlla aggiornamenti…");
+        private readonly ToolStripMenuItem automaticUpdates = new ToolStripMenuItem("Aggiornamenti automatici");
+        private readonly ToolStripMenuItem version = Info();
 
-        public TrayMenu(KeeperController controller)
+        public TrayMenu(KeeperController controller, Updater updater)
         {
             this.controller = controller;
+            this.updater = updater;
 
             enabled.Click += (sender, e) => controller.IsEnabled = !controller.IsEnabled;
             foreach (int seconds in KeeperController.IntervalOptions)
@@ -36,6 +41,9 @@ namespace KeepMeOn
                 StartupItem.SetEnabled(!StartupItem.IsEnabled);
                 Refresh();
             };
+            checkUpdates.Click += async (sender, e) => await updater.CheckAsync(userInitiated: true);
+            automaticUpdates.Click += (sender, e) => updater.AutomaticChecks = !updater.AutomaticChecks;
+            version.Text = $"KeepMeOn {updater.CurrentVersion}";
 
             Menu = new ContextMenuStrip();
             Menu.Items.AddRange(new ToolStripItem[]
@@ -54,12 +62,17 @@ namespace KeepMeOn
                 new ToolStripSeparator(),
                 startup,
                 new ToolStripMenuItem("Nascondi icona…", null, (sender, e) => HideIconRequested?.Invoke(this, EventArgs.Empty)),
-                new ToolStripMenuItem("Come funziona…", null, (sender, e) => WelcomeRequested?.Invoke(this, EventArgs.Empty)),
+                new ToolStripMenuItem("Configurazione guidata…", null, (sender, e) => OnboardingRequested?.Invoke(this, EventArgs.Empty)),
+                new ToolStripSeparator(),
+                checkUpdates,
+                automaticUpdates,
+                version,
                 new ToolStripSeparator(),
                 new ToolStripMenuItem("Esci", null, (sender, e) => ExitRequested?.Invoke(this, EventArgs.Empty)),
             });
             Menu.Opening += (sender, e) => Refresh();
             controller.Changed += OnControllerChanged;
+            updater.Changed += OnControllerChanged;
             Refresh();
         }
 
@@ -67,7 +80,7 @@ namespace KeepMeOn
 
         public event EventHandler SettingsRequested;
         public event EventHandler HideIconRequested;
-        public event EventHandler WelcomeRequested;
+        public event EventHandler OnboardingRequested;
         public event EventHandler ExitRequested;
 
         public static string StatusText(KeeperState state, int interval)
@@ -110,6 +123,10 @@ namespace KeepMeOn
             lunchSummary.Text = "Pausa: " + controller.LunchBreak.Summary;
 
             startup.Checked = StartupItem.IsEnabled;
+
+            checkUpdates.Enabled = !updater.IsBusy;
+            checkUpdates.Text = updater.IsBusy ? "Controllo aggiornamenti in corso…" : "Controlla aggiornamenti…";
+            automaticUpdates.Checked = updater.AutomaticChecks;
         }
 
         /// <summary>Riga informativa, in grigio e non cliccabile.</summary>
@@ -120,6 +137,7 @@ namespace KeepMeOn
         public void Dispose()
         {
             controller.Changed -= OnControllerChanged;
+            updater.Changed -= OnControllerChanged;
             Menu.Dispose();
         }
     }

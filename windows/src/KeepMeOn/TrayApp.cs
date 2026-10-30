@@ -17,6 +17,7 @@ namespace KeepMeOn
         private readonly SettingsStore settings = new SettingsStore();
         private readonly SynchronizationContext ui = SynchronizationContext.Current;
         private readonly KeeperController controller;
+        private readonly Updater updater;
         private readonly TrayMenu menu;
         private readonly NotifyIcon notifyIcon;
         private readonly Icon coveringIcon;
@@ -24,23 +25,25 @@ namespace KeepMeOn
         private readonly Icon offIcon;
         private readonly EventWaitHandle showIconSignal;
         private readonly RegisteredWaitHandle showIconWait;
-        private WelcomeForm welcomeForm;
+        private OnboardingForm onboardingForm;
         private SettingsForm settingsForm;
 
         public TrayApp()
         {
             Log.Write("Avvio");
             controller = new KeeperController(settings);
+            updater = new Updater(settings);
+            updater.InstallerStarted += (sender, e) => ExitThread();
 
             Size size = SystemInformation.SmallIconSize;
             coveringIcon = Ui.LoadIcon("TrayCovering", size);
             pausedIcon = Ui.LoadIcon("TrayPaused", size);
             offIcon = Ui.LoadIcon("TrayOff", size);
 
-            menu = new TrayMenu(controller);
+            menu = new TrayMenu(controller, updater);
             menu.SettingsRequested += (sender, e) => ShowSettings();
             menu.HideIconRequested += (sender, e) => HideIcon();
-            menu.WelcomeRequested += (sender, e) => ShowWelcome();
+            menu.OnboardingRequested += (sender, e) => ShowOnboarding();
             menu.ExitRequested += (sender, e) => ExitThread();
 
             notifyIcon = new NotifyIcon { ContextMenuStrip = menu.Menu };
@@ -56,8 +59,9 @@ namespace KeepMeOn
 
             if (!settings.WelcomeCompleted)
             {
-                ui.Post(_ => ShowWelcome(), null);
+                ui.Post(_ => ShowOnboarding(), null);
             }
+            updater.Start();
         }
 
         private void RefreshIcon()
@@ -108,15 +112,19 @@ namespace KeepMeOn
             }
         }
 
-        private void ShowWelcome()
+        /// <summary>Configurazione guidata; si considera completata quando la finestra si chiude.</summary>
+        private void ShowOnboarding()
         {
-            if (welcomeForm == null || welcomeForm.IsDisposed)
+            if (onboardingForm == null || onboardingForm.IsDisposed)
             {
-                welcomeForm = new WelcomeForm();
-                welcomeForm.SettingsRequested += (sender, e) => ShowSettings();
-                welcomeForm.FormClosed += (sender, e) => settings.WelcomeCompleted = true;
+                onboardingForm = new OnboardingForm(controller, updater);
+                onboardingForm.FormClosed += (sender, e) =>
+                {
+                    settings.WelcomeCompleted = true;
+                    menu.Refresh();
+                };
             }
-            BringToFront(welcomeForm);
+            BringToFront(onboardingForm);
         }
 
         private void ShowSettings()
@@ -143,11 +151,12 @@ namespace KeepMeOn
             Log.Write("Uscita");
             showIconWait.Unregister(null);
             showIconSignal.Dispose();
-            welcomeForm?.Close();
+            onboardingForm?.Close();
             settingsForm?.Close();
             notifyIcon.Visible = false;
             notifyIcon.Dispose();
             menu.Dispose();
+            updater.Dispose();
             controller.Dispose();
             base.ExitThreadCore();
         }

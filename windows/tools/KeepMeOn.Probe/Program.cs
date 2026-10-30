@@ -1,10 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using KeepMeOn.Core;
+using Microsoft.Win32;
 using static KeepMeOn.NativeMethods;
 
 namespace KeepMeOn.Probe
@@ -12,7 +15,8 @@ namespace KeepMeOn.Probe
     /// <summary>
     /// Verifiche su un Windows vero (GitHub Actions):
     ///   input                 prova i segnali neutri e controlla che azzerino il contatore di inattività
-    ///   snapshots &lt;cartella&gt;  salva le immagini di benvenuto, orari, menu e icone
+    ///   snapshots &lt;cartella&gt;  salva le immagini della configurazione guidata, degli orari, del menu e delle icone
+    ///   update &lt;setup.exe&gt;    legge la release da GitHub e prova l'installazione silenziosa usata dagli aggiornamenti
     /// </summary>
     internal static class Program
     {
@@ -25,11 +29,15 @@ namespace KeepMeOn.Probe
                     return Input();
                 case "snapshots":
                     return Snapshots(args.Length > 1 ? args[1] : "snapshots");
+                case "update":
+                    return Update(args[1]);
                 default:
-                    Console.Error.WriteLine("Uso: KeepMeOn.Probe input | snapshots <cartella>");
+                    Console.Error.WriteLine("Uso: KeepMeOn.Probe input | snapshots <cartella> | update <setup.exe>");
                     return 2;
             }
         }
+
+        // Segnale neutro.
 
         /// <summary>Esce con 0 solo se il segnale usato dall'app azzera il contatore senza muovere il cursore.</summary>
         private static int Input()
@@ -69,6 +77,66 @@ namespace KeepMeOn.Probe
             return appSignalWorks ? 0 : 1;
         }
 
+        // Aggiornamenti.
+
+        /// <summary>
+        /// Release reale su GitHub e installazione silenziosa con gli stessi parametri dell'app,
+        /// con e senza avvio all'accesso. Alla fine disinstalla.
+        /// </summary>
+        private static int Update(string setup)
+        {
+            bool ok = true;
+
+            var release = Updater.FetchLatestReleaseAsync(token: Environment.GetEnvironmentVariable("GH_TOKEN")).GetAwaiter().GetResult();
+            var asset = UpdatePolicy.AvailableUpdate(release, AppVersion.Parse("1.0.0"), Updater.AssetName);
+            Console.WriteLine($"GitHub: ultima release {release.TagName}, file per Windows: {asset?.DownloadUrl ?? "assente"}");
+            ok &= asset != null;
+
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "KeepMeOn");
+            string exe = Path.Combine(folder, "KeepMeOn.exe");
+            foreach (bool startup in new[] { false, true })
+            {
+                var install = Process.Start(new ProcessStartInfo(Path.GetFullPath(setup), Updater.InstallerArguments(startup)) { UseShellExecute = false });
+                install.WaitForExit();
+                Thread.Sleep(4000);
+                bool installed = File.Exists(exe);
+                bool runKey = RunKeyPresent();
+                var running = Process.GetProcessesByName("KeepMeOn");
+                Console.WriteLine($"Installazione silenziosa, avvio all'accesso {(startup ? "sì" : "no")}: uscita {install.ExitCode}, " +
+                                  $"installata={installed}, avvio all'accesso={runKey}, riaperta={running.Length > 0}");
+                ok &= install.ExitCode == 0 && installed && runKey == startup && running.Length > 0;
+                foreach (var process in running)
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            if (File.Exists(exe))
+            {
+                Console.WriteLine($"Versione installata: {FileVersionInfo.GetVersionInfo(exe).FileVersion}");
+            }
+
+            var uninstall = Process.Start(new ProcessStartInfo(Path.Combine(folder, "unins000.exe"), "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART") { UseShellExecute = false });
+            uninstall.WaitForExit();
+            Thread.Sleep(3000);
+            bool removed = !File.Exists(exe) && !RunKeyPresent();
+            Console.WriteLine($"Disinstallazione: uscita {uninstall.ExitCode}, app e avvio all'accesso rimossi={removed}");
+            ok &= removed;
+
+            Console.WriteLine(ok ? "Esito: aggiornamenti e installazione silenziosa funzionano." : "Esito: qualcosa NON funziona.");
+            return ok ? 0 : 1;
+        }
+
+        private static bool RunKeyPresent()
+        {
+            using (var run = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run"))
+            {
+                return run?.GetValue("KeepMeOn") != null;
+            }
+        }
+
+        // Immagini.
+
         private static int Snapshots(string folder)
         {
             Directory.CreateDirectory(folder);
@@ -81,10 +149,38 @@ namespace KeepMeOn.Probe
             try
             {
                 using (var controller = new KeeperController(settings))
+                using (var updater = new Updater(settings))
                 {
-                    Capture(new WelcomeForm(), folder, "benvenuto");
-                    Capture(new SettingsForm(controller), folder, "orari");
-                    using (var menu = new TrayMenu(controller))
+                    using (var onboarding = new OnboardingForm(controller, updater))
+                    {
+                        Open(onboarding);
+                        string[] names = { "benvenuto", "quando", "pausa-pranzo", "avvio", "pronto" };
+                        for (int i = 0; i < names.Length; i++)
+                        {
+                            onboarding.GoTo(i);
+                            Pump();
+                            Snap(onboarding, folder, $"guida-{i + 1}-{names[i]}");
+                        }
+                        onboarding.Close();
+                    }
+
+                    using (var form = new SettingsForm(controller))
+                    {
+                        Open(form);
+                        Snap(form, folder, "orari");
+                        form.Close();
+                    }
+
+                    var release = ReleaseInfo.Parse(@"{""tag_name"": ""v1.3.0"", ""html_url"": ""https://github.com/christianmusumeci00/KeepMeOn/releases"",
+                        ""assets"": [{""name"": ""KeepMeOn-Setup.exe"", ""size"": 1, ""browser_download_url"": ""https://example.invalid/KeepMeOn-Setup.exe""}]}");
+                    using (var form = new UpdateForm(updater, release, release.Asset(Updater.AssetName)))
+                    {
+                        Open(form);
+                        Snap(form, folder, "aggiornamento");
+                        form.Close();
+                    }
+
+                    using (var menu = new TrayMenu(controller, updater))
                     {
                         menu.Menu.Show(new Point(300, 200));
                         Pump();
@@ -102,16 +198,19 @@ namespace KeepMeOn.Probe
             return 0;
         }
 
-        private static void Capture(Form form, string folder, string name)
+        private static void Open(Form form)
         {
             form.StartPosition = FormStartPosition.Manual;
             form.Location = new Point(40, 40);
             form.Show();
             Pump();
+        }
+
+        private static void Snap(Form form, string folder, string name)
+        {
             Rectangle visible = VisibleBounds(form);
             SaveScreen(visible, folder, name);
             Console.WriteLine($"{name}: {visible.Width}×{visible.Height}");
-            form.Close();
         }
 
         /// <summary>

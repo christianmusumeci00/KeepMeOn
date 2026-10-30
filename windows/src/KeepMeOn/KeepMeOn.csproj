@@ -10,7 +10,7 @@
     <AssemblyName>KeepMeOn</AssemblyName>
     <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Product>KeepMeOn</Product>
     <Company>Christian Musumeci</Company>
     <Copyright>© 2026 Christian Musumeci</Copyright>
@@ -23,6 +23,8 @@
     <Compile Include="..\KeepMeOn.Core\*.cs" Link="Core\%(Filename)%(Extension)" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Serialization" />
     <EmbeddedResource Include="Resources\*.ico" LogicalName="%(Filename)%(Extension)" />
     <InternalsVisibleTo Include="KeepMeOn.Probe" />
   </ItemGroup>

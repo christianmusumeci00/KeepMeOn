@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using KeepMeOn.Core;
 using Microsoft.Win32;
 
@@ -80,7 +82,40 @@ namespace KeepMeOn
             set => SetInt("WelcomeCompleted", value ? 1 : 0);
         }
 
+        public bool AutomaticUpdateChecks
+        {
+            get => GetInt("AutomaticUpdateChecks", 1) != 0;
+            set => SetInt("AutomaticUpdateChecks", value ? 1 : 0);
+        }
+
+        public DateTime? LastUpdateCheck
+        {
+            get => DateTime.TryParse(GetString("LastUpdateCheck"), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var date)
+                ? date
+                : (DateTime?)null;
+            set => SetString("LastUpdateCheck", value?.ToString("o", CultureInfo.InvariantCulture) ?? "");
+        }
+
+        /// <summary>Solo per le prove: indirizzo alternativo della release (anche file:///…).</summary>
+        public string UpdateFeedUrl => GetString("UpdateFeedUrl");
+
         public void DeleteAll() => Registry.CurrentUser.DeleteSubKeyTree(keyPath, false);
+
+        private string GetString(string name)
+        {
+            using (var key = Registry.CurrentUser.OpenSubKey(keyPath))
+            {
+                return key?.GetValue(name) as string;
+            }
+        }
+
+        private void SetString(string name, string value)
+        {
+            using (var key = Registry.CurrentUser.CreateSubKey(keyPath))
+            {
+                key.SetValue(name, value, RegistryValueKind.String);
+            }
+        }
 
         private int GetInt(string name, int fallback)
         {

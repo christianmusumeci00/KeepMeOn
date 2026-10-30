@@ -4,7 +4,7 @@
 
 #define AppName "KeepMeOn"
 ; Da tenere allineata a <Version> in windows\src\KeepMeOn\KeepMeOn.csproj.
-#define AppVersion "1.1.0"
+#define AppVersion "1.2.0"
 #define AppExe "KeepMeOn.exe"
 #define BuildDir "..\src\KeepMeOn\bin\Release\net48"
 
@@ -31,6 +31,8 @@ VersionInfoProductName={#AppName}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+; KeepMeOn la chiude [Code] con taskkill: niente gestore riavvio di Windows.
+CloseApplications=no
 
 [Languages]
 Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
@@ -53,6 +55,8 @@ Root: HKCU; Subkey: "Software\KeepMeOn"; Flags: uninsdeletekey
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "Avvia KeepMeOn"; Flags: nowait postinstall skipifsilent
+; Aggiornamento dall'app (installazione silenziosa): riapre KeepMeOn alla fine.
+Filename: "{app}\{#AppExe}"; Flags: nowait; Check: WizardSilent
 
 [Code]
 // L'app resta aperta nell'area di notifica: va chiusa prima di sostituirla o rimuoverla.
