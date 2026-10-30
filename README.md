@@ -39,8 +39,8 @@ Ti alzi per un caffè, rispondi al citofono o vai a ritirare una stampa. Dopo ci
     <th>Windows</th>
   </tr>
   <tr>
-    <td><img src="docs/benvenuto.png" width="400" alt="Schermata di benvenuto su Mac"></td>
-    <td><img src="docs/windows/benvenuto.png" width="400" alt="Schermata di benvenuto su Windows"></td>
+    <td><img src="docs/benvenuto.png" width="400" alt="Configurazione guidata su Mac: benvenuto"></td>
+    <td><img src="docs/windows/benvenuto.png" width="400" alt="Configurazione guidata su Windows: benvenuto"></td>
   </tr>
 </table>
 
@@ -55,8 +55,10 @@ Ti alzi per un caffè, rispondi al citofono o vai a ritirare una stampa. Dopo ci
   - durante la pausa pranzo, se la attivi.
 - **Orario di lavoro:** ora di inizio e di fine e giorni della settimana (predefinito lun–ven, 09:00–18:00). Funzionano anche le fasce a cavallo della mezzanotte.
 - **Pausa pranzo:** una fascia giornaliera in cui l'app non interviene (predefinita 13:00–14:00).
+- **Configurazione guidata** al primo avvio: in pochi passi scegli quando deve funzionare, la pausa pranzo, l'avvio automatico e gli aggiornamenti.
+- **Aggiornamenti con un clic:** dal menu dell'icona, oppure in automatico una volta al giorno (si può disattivare).
 - **Avvio automatico** e possibilità di **nascondere l'icona**: KeepMeOn può lavorare senza nulla di visibile.
-- **Non si collega a Internet e non raccoglie dati.** Le impostazioni restano sul tuo computer.
+- **Non raccoglie dati.** Le impostazioni restano sul tuo computer. Si collega a Internet solo per controllare su GitHub se c'è una nuova versione, e solo se gli aggiornamenti automatici sono attivi o lo chiedi tu.
 
 Se ti allontani a lungo, blocca il computer (**⌃⌘Q** su Mac, **Windows+L** su Windows): KeepMeOn si mette in pausa e Teams mostra correttamente che sei assente.
 
@@ -67,11 +69,12 @@ Se ti allontani a lungo, blocca il computer (**⌃⌘Q** su Mac, **Windows+L** s
 1. Scarica **[KeepMeOn.dmg](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn.dmg)**.
 2. Apri il DMG e trascina **KeepMeOn** nella cartella **Applicazioni**.
 3. Apri **KeepMeOn** da Applicazioni o da Spotlight. L'app è firmata con un certificato Developer ID e notarizzata da Apple, quindi si apre con un doppio clic. Visto che arriva da Internet, macOS chiede una sola conferma: premi **Apri**.
-4. **Permesso di Accessibilità.**
-   1. Nella schermata di benvenuto premi **Apri Impostazioni Accessibilità** e attiva **KeepMeOn** nell'elenco.
-   2. L'app si riavvia da sola: macOS applica questo permesso solo all'avvio.
-   3. Il benvenuto ricompare con «Permesso attivo».
-5. Premi **Inizia**. Se vuoi, attiva **Avvia KeepMeOn al login** direttamente dal benvenuto.
+4. Si apre la **configurazione guidata**. Segui i passi con **Avanti**:
+   1. **Permesso di Accessibilità:** premi **Apri Impostazioni Accessibilità** e attiva **KeepMeOn** nell'elenco. L'app si riavvia da sola, perché macOS applica questo permesso solo all'avvio, e la guida riprende da dove eri rimasto.
+   2. **Quando deve funzionare:** sempre, oppure solo in orario di lavoro, con orari e giorni.
+   3. **Pausa pranzo:** se KeepMeOn deve fermarsi e in quale fascia.
+   4. **Avvio e aggiornamenti:** avvio al login e controllo automatico degli aggiornamenti.
+5. Nel riepilogo premi **Inizia**.
 
 Nella barra dei menu compare una tazzina.
 
@@ -80,7 +83,7 @@ Nella barra dei menu compare una tazzina.
 1. Scarica **[KeepMeOn-Setup.exe](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn-Setup.exe)** e avvialo.
 2. L'installer non è firmato con un certificato a pagamento, quindi la prima volta Windows mostra «Windows ha protetto il PC». Clicca **Ulteriori informazioni** › **Esegui comunque**.
 3. L'installazione è solo per il tuo utente: non servono permessi di amministratore. Se vuoi, lascia attiva l'opzione «Avvia KeepMeOn all'accesso a Windows».
-4. Si apre la schermata di benvenuto: premi **Inizia**. Su Windows non c'è nessun permesso da concedere.
+4. Si apre la **configurazione guidata**: scegli quando deve funzionare, la pausa pranzo, l'avvio all'accesso e gli aggiornamenti, poi premi **Inizia**. Su Windows non c'è nessun permesso da concedere.
 
 La tazzina compare nell'area di notifica, vicino all'orologio. Se non la vedi, apri la freccia «Mostra icone nascoste» e trascinala sulla barra delle applicazioni.
 
@@ -125,8 +128,20 @@ Su Mac si apre dalla tazzina nella barra dei menu; su Windows con un clic, sinis
 | Imposta orari… | Apre la finestra con orario di lavoro e pausa pranzo |
 | Avvia al login (Mac) / Avvia all'accesso a Windows | Avvia KeepMeOn all'accesso al computer |
 | Nascondi icona… | Toglie l'icona. Per riaverla riapri KeepMeOn: su Mac da Spotlight o Applicazioni, su Windows dal menu Start |
-| Come funziona… | Riapre la schermata di benvenuto |
+| Configurazione guidata… | Riapre la configurazione guidata dall'inizio |
+| Controlla aggiornamenti… | Cerca subito una nuova versione su GitHub |
+| Aggiornamenti automatici | Controlla da solo una volta al giorno (attivo di serie) |
+| KeepMeOn 1.2.0 | La versione installata |
 | Esci | Chiude l'app |
+
+### Aggiornamenti
+
+Quando c'è una nuova versione, KeepMeOn chiede se installarla: con **Installa e riavvia** la scarica, la installa e si riapre da sola. Impostazioni e permessi restano; con **Novità…** (su Windows «Leggi le novità») vedi cosa cambia.
+
+- **Mac:** prima di installare, KeepMeOn verifica che la nuova app sia firmata dallo stesso sviluppatore di quella in uso; se non lo è, l'aggiornamento viene rifiutato. Serve che KeepMeOn possa scrivere nella cartella in cui si trova, per esempio Applicazioni.
+- **Windows:** l'installer della nuova versione parte senza finestre e mantiene la tua scelta sull'avvio all'accesso.
+
+Il controllo automatico è una semplice richiesta all'indirizzo pubblico delle release su GitHub: non invia nessun dato personale.
 
 ### Orari
 
@@ -279,7 +294,7 @@ La voce nell'elenco appartiene a un'altra build di KeepMeOn, per esempio una com
    ```
 
 2. Esci da KeepMeOn e riaprila.
-3. Concedi di nuovo il permesso dal benvenuto o dal menu.
+3. Concedi di nuovo il permesso dal menu (**Concedi il permesso di Accessibilità…**).
 
 **Windows: all'avvio dell'installer compare «Windows ha protetto il PC».**
 Succede perché l'installer non è firmato con un certificato a pagamento. Clicca **Ulteriori informazioni** › **Esegui comunque**. Serve solo la prima volta.
@@ -298,6 +313,9 @@ Succede perché l'installer non è firmato con un certificato a pagamento. Clicc
   ```
 
 - Su Windows ogni intervento è scritto in `%LOCALAPPDATA%\KeepMeOn\keepmeon.log`.
+
+**Come aggiorno KeepMeOn?**
+Dal menu dell'icona scegli **Controlla aggiornamenti…**; se c'è una nuova versione premi **Installa e riavvia**. Con **Aggiornamenti automatici** attivo, KeepMeOn controlla da sola una volta al giorno e ti avvisa. Se l'aggiornamento non riesce, puoi sempre scaricare l'ultima versione dalla pagina [Release](https://github.com/christianmusumeci00/KeepMeOn/releases/latest).
 
 **Il computer non si blocca più da solo.**
 È voluto: mentre KeepMeOn è attiva e non sei in pausa, il computer non va in stop per inattività. Quando ti allontani a lungo, bloccalo (⌃⌘Q su Mac, Windows+L su Windows).
