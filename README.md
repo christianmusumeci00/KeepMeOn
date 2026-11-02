@@ -116,9 +116,16 @@ The cup appears in the notification area, next to the clock. If you don't see it
 
 On Mac it opens from the cup in the menu bar; on Windows with a click, left or right, on the cup next to the clock.
 
-<p align="center">
-  <img src="docs/windows/menu.png" width="230" alt="The menu on Windows">
-</p>
+<table>
+  <tr>
+    <th>Mac</th>
+    <th>Windows</th>
+  </tr>
+  <tr>
+    <td><img src="docs/menu.png" width="300" alt="The menu on Mac"></td>
+    <td><img src="docs/windows/menu.png" width="230" alt="The menu on Windows"></td>
+  </tr>
+</table>
 
 | Item | What it does |
 |---|---|
