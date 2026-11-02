@@ -13,7 +13,7 @@ import IOKit.pwr_mgt
 ///   Non muove il cursore, non digita e non clicca: per le app equivale a nessun cambiamento.
 ///   Richiede il permesso di Accessibilità.
 final class ActivityKeeper {
-    private static let assertionName = "KeepMeOn: utente presente" as CFString
+    private static let assertionName = "KeepMeOn: user present" as CFString
     private static let nullID = IOPMAssertionID(kIOPMNullAssertionID)
 
     /// Marca gli eventi inviati da KeepMeOn ("KMON"), così si riconoscono in un event tap.

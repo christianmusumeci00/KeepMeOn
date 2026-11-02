@@ -14,8 +14,8 @@
     <Product>KeepMeOn</Product>
     <Company>Christian Musumeci</Company>
     <Copyright>© 2026 Christian Musumeci</Copyright>
-    <Description>Resta disponibile su Microsoft Teams anche quando ti allontani per un attimo.</Description>
-    <NeutralLanguage>it-IT</NeutralLanguage>
+    <Description>Stay available on Microsoft Teams even when you step away for a moment.</Description>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>

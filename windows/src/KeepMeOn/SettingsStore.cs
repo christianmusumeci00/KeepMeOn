@@ -76,6 +76,13 @@ namespace KeepMeOn
             set => SetInt("ShowTrayIcon", value ? 1 : 0);
         }
 
+        /// <summary>Lingua scelta nell'installer o nell'app; null se non è mai stata scelta.</summary>
+        public Language? Language
+        {
+            get => Languages.FromCode(GetString("Language"));
+            set => SetString("Language", value?.Code() ?? "");
+        }
+
         public bool WelcomeCompleted
         {
             get => GetInt("WelcomeCompleted", 0) != 0;

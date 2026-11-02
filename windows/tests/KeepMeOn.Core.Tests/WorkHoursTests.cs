@@ -115,11 +115,20 @@ namespace KeepMeOn.Core.Tests
         [Fact]
         public void Summary()
         {
-            Assert.Equal("lun–ven, 09:00–18:00", WorkHours.Standard.Summary);
-            Assert.Equal("lun, mer, ven, 08:30–13:00", new WorkHours(8 * 60 + 30, 13 * 60, new[] { 2, 4, 6 }).Summary);
-            Assert.Equal("tutti i giorni, tutto il giorno", new WorkHours(0, 0, new[] { 1, 2, 3, 4, 5, 6, 7 }).Summary);
-            Assert.Equal("sab, dom, 22:00–06:00", new WorkHours(22 * 60, 6 * 60, new[] { 7, 1 }).Summary);
-            Assert.Equal("nessun giorno, 09:00–18:00", new WorkHours(540, 1080, Array.Empty<int>()).Summary);
+            Assert.Equal("lun–ven, 09:00–18:00", WorkHours.Standard.Summary(Language.Italian));
+            Assert.Equal("lun, mer, ven, 08:30–13:00", new WorkHours(8 * 60 + 30, 13 * 60, new[] { 2, 4, 6 }).Summary(Language.Italian));
+            Assert.Equal("tutti i giorni, tutto il giorno", new WorkHours(0, 0, new[] { 1, 2, 3, 4, 5, 6, 7 }).Summary(Language.Italian));
+            Assert.Equal("sab, dom, 22:00–06:00", new WorkHours(22 * 60, 6 * 60, new[] { 7, 1 }).Summary(Language.Italian));
+            Assert.Equal("nessun giorno, 09:00–18:00", new WorkHours(540, 1080, Array.Empty<int>()).Summary(Language.Italian));
+        }
+
+        [Fact]
+        public void SummaryInEnglish()
+        {
+            Assert.Equal("Mon–Fri, 09:00–18:00", WorkHours.Standard.Summary(Language.English));
+            Assert.Equal("Mon, Wed, Fri, 08:30–13:00", new WorkHours(8 * 60 + 30, 13 * 60, new[] { 2, 4, 6 }).Summary(Language.English));
+            Assert.Equal("every day, all day", new WorkHours(0, 0, new[] { 1, 2, 3, 4, 5, 6, 7 }).Summary(Language.English));
+            Assert.Equal("no days, 09:00–18:00", new WorkHours(540, 1080, Array.Empty<int>()).Summary(Language.English));
         }
     }
 }

@@ -31,6 +31,11 @@ namespace KeepMeOn
         public TrayApp()
         {
             Log.Write("Avvio");
+            // Lingua scelta nell'installer o nell'app. Fino alla 1.2 l'app era solo in italiano:
+            // chi l'aveva già configurata la ritrova com'era. Salvata subito, così la regola vale solo per chi aggiorna.
+            L10n.Set(settings.Language ?? (settings.WelcomeCompleted ? Language.Italian : Languages.Default));
+            settings.Language = L10n.Current;
+            L10n.Changed += OnLanguageChanged;
             controller = new KeeperController(settings);
             updater = new Updater(settings);
             updater.InstallerStarted += (sender, e) => ExitThread();
@@ -79,6 +84,12 @@ namespace KeepMeOn
             notifyIcon.Text = text.Length > 63 ? text.Substring(0, 63) : text;
         }
 
+        private void OnLanguageChanged(object sender, EventArgs e)
+        {
+            settings.Language = L10n.Current;
+            RefreshIcon();
+        }
+
         private void OnTrayMouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
@@ -101,8 +112,9 @@ namespace KeepMeOn
         private void HideIcon()
         {
             var answer = MessageBox.Show(
-                "KeepMeOn continuerà a funzionare senza nulla di visibile. Per far ricomparire l'icona riapri KeepMeOn dal menu Start.",
-                "Nascondere l'icona?",
+                L10n.T("KeepMeOn will keep working with nothing visible. To bring the icon back, open KeepMeOn again from the Start menu.",
+                       "KeepMeOn continuerà a funzionare senza nulla di visibile. Per far ricomparire l'icona riapri KeepMeOn dal menu Start."),
+                L10n.T("Hide the icon?", "Nascondere l'icona?"),
                 MessageBoxButtons.OKCancel,
                 MessageBoxIcon.Question);
             if (answer == DialogResult.OK)
@@ -149,6 +161,7 @@ namespace KeepMeOn
         protected override void ExitThreadCore()
         {
             Log.Write("Uscita");
+            L10n.Changed -= OnLanguageChanged;
             showIconWait.Unregister(null);
             showIconSignal.Dispose();
             onboardingForm?.Close();

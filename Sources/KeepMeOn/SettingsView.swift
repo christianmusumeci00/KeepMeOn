@@ -1,14 +1,21 @@
 import AppKit
+import Combine
 import KeepMeOnCore
 import SwiftUI
 
-/// Finestra degli orari: fascia di lavoro (inizio, fine, giorni) e pausa pranzo.
+/// Finestra delle impostazioni: lingua, fascia di lavoro (inizio, fine, giorni) e pausa pranzo.
 struct SettingsView: View {
     @ObservedObject var controller: KeeperController
+    @ObservedObject var localization = Localization.shared
 
     var body: some View {
         Form {
-            Toggle("Solo in orario di lavoro", isOn: $controller.workHoursOnly)
+            LanguagePicker(localization: localization)
+
+            Divider()
+                .padding(.vertical, 6)
+
+            Toggle(tr("Work hours only", "Solo in orario di lavoro"), isOn: $controller.workHoursOnly)
             WorkHoursFields(controller: controller)
                 .disabled(!controller.workHoursOnly)
             Note(text: controller.workHoursNote)
@@ -16,14 +23,31 @@ struct SettingsView: View {
             Divider()
                 .padding(.vertical, 6)
 
-            Toggle("Pausa pranzo", isOn: $controller.lunchBreakEnabled)
+            Toggle(tr("Lunch break", "Pausa pranzo"), isOn: $controller.lunchBreakEnabled)
             LunchBreakFields(controller: controller)
                 .disabled(!controller.lunchBreakEnabled)
-            Note(text: "Durante la pausa pranzo KeepMeOn non interviene, tutti i giorni.")
+            Note(text: tr("During the lunch break KeepMeOn doesn't step in, every day.",
+                          "Durante la pausa pranzo KeepMeOn non interviene, tutti i giorni."))
         }
         .formStyle(.columns)
+        // Ricostruisce tutti i controlli quando cambia la lingua, anche le etichette dei campi.
+        .id(localization.language)
         .padding(20)
         .frame(width: 500)
+    }
+}
+
+/// Scelta della lingua: nelle impostazioni e nella configurazione guidata.
+struct LanguagePicker: View {
+    @ObservedObject var localization: Localization
+
+    var body: some View {
+        Picker(tr("Language:", "Lingua:"), selection: $localization.language) {
+            ForEach(Language.allCases, id: \.self) { language in
+                Text(language.displayName).tag(language)
+            }
+        }
+        .fixedSize()
     }
 }
 
@@ -32,12 +56,12 @@ struct WorkHoursFields: View {
     @ObservedObject var controller: KeeperController
 
     var body: some View {
-        DatePicker("Inizio:", selection: controller.timeBinding(\.workHours.startMinute), displayedComponents: .hourAndMinute)
-        DatePicker("Fine:", selection: controller.timeBinding(\.workHours.endMinute), displayedComponents: .hourAndMinute)
-        LabeledContent("Giorni:") {
+        DatePicker(tr("Start:", "Inizio:"), selection: controller.timeBinding(\.workHours.startMinute), displayedComponents: .hourAndMinute)
+        DatePicker(tr("End:", "Fine:"), selection: controller.timeBinding(\.workHours.endMinute), displayedComponents: .hourAndMinute)
+        LabeledContent(tr("Days:", "Giorni:")) {
             HStack(spacing: 10) {
                 ForEach(WorkHours.mondayFirst, id: \.self) { day in
-                    Toggle(WorkHours.shortName(of: day).capitalized, isOn: controller.weekdayBinding(day))
+                    Toggle(WorkHours.shortName(of: day, in: .current).capitalized, isOn: controller.weekdayBinding(day))
                         .toggleStyle(.checkbox)
                 }
             }
@@ -51,8 +75,8 @@ struct LunchBreakFields: View {
     @ObservedObject var controller: KeeperController
 
     var body: some View {
-        DatePicker("Dalle:", selection: controller.timeBinding(\.lunchBreak.startMinute), displayedComponents: .hourAndMinute)
-        DatePicker("Alle:", selection: controller.timeBinding(\.lunchBreak.endMinute), displayedComponents: .hourAndMinute)
+        DatePicker(tr("From:", "Dalle:"), selection: controller.timeBinding(\.lunchBreak.startMinute), displayedComponents: .hourAndMinute)
+        DatePicker(tr("To:", "Alle:"), selection: controller.timeBinding(\.lunchBreak.endMinute), displayedComponents: .hourAndMinute)
     }
 }
 
@@ -70,11 +94,14 @@ struct Note: View {
 
 extension KeeperController {
     var workHoursNote: String {
-        var lines = ["Fuori fascia KeepMeOn resta acceso ma non interviene."]
+        var lines = [tr("Outside these hours KeepMeOn stays on but doesn't step in.",
+                        "Fuori fascia KeepMeOn resta acceso ma non interviene.")]
         if workHours.startMinute == workHours.endMinute {
-            lines.append("Inizio e fine coincidono: la fascia copre l'intera giornata.")
+            lines.append(tr("Start and end are the same: the range covers the whole day.",
+                            "Inizio e fine coincidono: la fascia copre l'intera giornata."))
         } else if workHours.startMinute > workHours.endMinute {
-            lines.append("La fascia termina il giorno dopo, come un turno di notte.")
+            lines.append(tr("The range ends the next day, like a night shift.",
+                            "La fascia termina il giorno dopo, come un turno di notte."))
         }
         return lines.joined(separator: " ")
     }
@@ -117,6 +144,7 @@ final class SettingsWindow {
     static let shared = SettingsWindow()
 
     private var window: NSWindow?
+    private var titleBinding: AnyCancellable?
 
     func show(controller: KeeperController) {
         let window = self.window ?? makeWindow(controller: controller)
@@ -127,7 +155,7 @@ final class SettingsWindow {
 
     private func makeWindow(controller: KeeperController) -> NSWindow {
         let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(controller: controller)))
-        window.title = "KeepMeOn – Orari"
+        titleBinding = Localization.shared.bindTitle(of: window, "KeepMeOn – Settings", "KeepMeOn – Impostazioni")
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
         window.center()

@@ -75,37 +75,40 @@ extension WorkHours {
     /// Ordine di visualizzazione dei giorni, da lunedì a domenica.
     public static let mondayFirst = [2, 3, 4, 5, 6, 7, 1]
 
-    public static func shortName(of weekday: Int) -> String {
-        ["dom", "lun", "mar", "mer", "gio", "ven", "sab"][weekday - 1]
+    public static func shortName(of weekday: Int, in language: Language) -> String {
+        switch language {
+        case .english: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][weekday - 1]
+        case .italian: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"][weekday - 1]
+        }
     }
 
     public static func timeString(_ minute: Int) -> String {
         String(format: "%02d:%02d", minute / 60, minute % 60)
     }
 
-    /// Descrizione breve, es. "lun–ven, 09:00–18:00".
-    public var summary: String {
-        "\(daysSummary), \(hoursSummary)"
+    /// Descrizione breve, es. "Mon–Fri, 09:00–18:00" o "lun–ven, 09:00–18:00".
+    public func summary(in language: Language) -> String {
+        "\(daysSummary(in: language)), \(hoursSummary(in: language))"
     }
 
-    var daysSummary: String {
+    func daysSummary(in language: Language) -> String {
         let days = Self.mondayFirst.filter(weekdays.contains)
         switch days.count {
-        case 0: return "nessun giorno"
-        case 7: return "tutti i giorni"
+        case 0: return language.pick("no days", "nessun giorno")
+        case 7: return language.pick("every day", "tutti i giorni")
         default: break
         }
         // Tre o più giorni consecutivi diventano un intervallo ("lun–ven").
         let positions = days.compactMap { Self.mondayFirst.firstIndex(of: $0) }
         let isRun = positions[positions.count - 1] - positions[0] == positions.count - 1
         if isRun, days.count >= 3 {
-            return "\(Self.shortName(of: days[0]))–\(Self.shortName(of: days[days.count - 1]))"
+            return "\(Self.shortName(of: days[0], in: language))–\(Self.shortName(of: days[days.count - 1], in: language))"
         }
-        return days.map { Self.shortName(of: $0) }.joined(separator: ", ")
+        return days.map { Self.shortName(of: $0, in: language) }.joined(separator: ", ")
     }
 
-    var hoursSummary: String {
-        if startMinute == endMinute { return "tutto il giorno" }
+    func hoursSummary(in language: Language) -> String {
+        if startMinute == endMinute { return language.pick("all day", "tutto il giorno") }
         return "\(Self.timeString(startMinute))–\(Self.timeString(endMinute))"
     }
 }

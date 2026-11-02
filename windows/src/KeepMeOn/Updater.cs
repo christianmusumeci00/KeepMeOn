@@ -95,7 +95,8 @@ namespace KeepMeOn
                     Log.Write($"Nessun aggiornamento (in uso {CurrentVersion}, ultima {release.TagName})");
                     if (userInitiated)
                     {
-                        MessageBox.Show($"Hai l'ultima versione disponibile, la {CurrentVersion}.", "KeepMeOn è aggiornata",
+                        MessageBox.Show(L10n.T($"You have the latest version, {CurrentVersion}.", $"Hai l'ultima versione disponibile, la {CurrentVersion}."),
+                                        L10n.T("KeepMeOn is up to date", "KeepMeOn è aggiornata"),
                                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     return;
@@ -181,25 +182,28 @@ namespace KeepMeOn
         }
 
         /// <summary>
-        /// Parametri dell'installer per un aggiornamento: senza finestre, e con la stessa scelta
-        /// di oggi sull'avvio all'accesso, così l'aggiornamento non la cambia.
+        /// Parametri dell'installer per un aggiornamento: senza finestre, e con le stesse scelte
+        /// di oggi su avvio all'accesso e lingua, così l'aggiornamento non le cambia.
         /// </summary>
-        internal static string InstallerArguments(bool startupEnabled) =>
-            "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /MERGETASKS=\"" + (startupEnabled ? "startup" : "!startup") + "\"";
+        internal static string InstallerArguments(bool startupEnabled, Language language) =>
+            "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /MERGETASKS=\"" + (startupEnabled ? "startup" : "!startup") + "\"" +
+            " /LANG=" + language.Code();
 
         /// <summary>Avvia l'installer scaricato e chiede all'app di chiudersi.</summary>
         public void LaunchInstaller(string path)
         {
             Log.Write("Avvio dell'installer per l'aggiornamento");
-            Process.Start(new ProcessStartInfo(path, InstallerArguments(StartupItem.IsEnabled)) { UseShellExecute = false });
+            Process.Start(new ProcessStartInfo(path, InstallerArguments(StartupItem.IsEnabled, L10n.Current)) { UseShellExecute = false });
             InstallerStarted?.Invoke(this, EventArgs.Empty);
         }
 
         internal static void ShowError(Exception error)
         {
             var answer = MessageBox.Show(
-                $"{error.Message}\n\nVuoi aprire la pagina di KeepMeOn su GitHub per scaricare l'ultima versione?",
-                "Aggiornamento non riuscito",
+                error.Message + "\n\n" + L10n.T(
+                    "Do you want to open the KeepMeOn page on GitHub to download the latest version?",
+                    "Vuoi aprire la pagina di KeepMeOn su GitHub per scaricare l'ultima versione?"),
+                L10n.T("Update failed", "Aggiornamento non riuscito"),
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
             if (answer == DialogResult.Yes)

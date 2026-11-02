@@ -88,14 +88,24 @@ final class WorkHoursTests: XCTestCase {
     }
 
     func testSummary() {
-        XCTAssertEqual(WorkHours.standard.summary, "lun–ven, 09:00–18:00")
-        XCTAssertEqual(WorkHours(startMinute: 8 * 60 + 30, endMinute: 13 * 60, weekdays: [2, 4, 6]).summary,
+        XCTAssertEqual(WorkHours.standard.summary(in: .italian), "lun–ven, 09:00–18:00")
+        XCTAssertEqual(WorkHours(startMinute: 8 * 60 + 30, endMinute: 13 * 60, weekdays: [2, 4, 6]).summary(in: .italian),
                        "lun, mer, ven, 08:30–13:00")
-        XCTAssertEqual(WorkHours(startMinute: 0, endMinute: 0, weekdays: Set(1...7)).summary,
+        XCTAssertEqual(WorkHours(startMinute: 0, endMinute: 0, weekdays: Set(1...7)).summary(in: .italian),
                        "tutti i giorni, tutto il giorno")
-        XCTAssertEqual(WorkHours(startMinute: 22 * 60, endMinute: 6 * 60, weekdays: [7, 1]).summary,
+        XCTAssertEqual(WorkHours(startMinute: 22 * 60, endMinute: 6 * 60, weekdays: [7, 1]).summary(in: .italian),
                        "sab, dom, 22:00–06:00")
-        XCTAssertEqual(WorkHours(startMinute: 540, endMinute: 1080, weekdays: []).summary,
+        XCTAssertEqual(WorkHours(startMinute: 540, endMinute: 1080, weekdays: []).summary(in: .italian),
                        "nessun giorno, 09:00–18:00")
+    }
+
+    func testSummaryInEnglish() {
+        XCTAssertEqual(WorkHours.standard.summary(in: .english), "Mon–Fri, 09:00–18:00")
+        XCTAssertEqual(WorkHours(startMinute: 8 * 60 + 30, endMinute: 13 * 60, weekdays: [2, 4, 6]).summary(in: .english),
+                       "Mon, Wed, Fri, 08:30–13:00")
+        XCTAssertEqual(WorkHours(startMinute: 0, endMinute: 0, weekdays: Set(1...7)).summary(in: .english),
+                       "every day, all day")
+        XCTAssertEqual(WorkHours(startMinute: 540, endMinute: 1080, weekdays: []).summary(in: .english),
+                       "no days, 09:00–18:00")
     }
 }

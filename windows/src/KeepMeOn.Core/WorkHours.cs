@@ -20,7 +20,8 @@ namespace KeepMeOn.Core
         /// <summary>Ordine di visualizzazione dei giorni, da lunedì a domenica.</summary>
         public static readonly IReadOnlyList<int> MondayFirst = new[] { 2, 3, 4, 5, 6, 7, 1 };
 
-        private static readonly string[] ShortNames = { "dom", "lun", "mar", "mer", "gio", "ven", "sab" };
+        private static readonly string[] EnglishShortNames = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+        private static readonly string[] ItalianShortNames = { "dom", "lun", "mar", "mer", "gio", "ven", "sab" };
 
         /// <summary>Predefinita: lunedì–venerdì, 09:00–18:00.</summary>
         public static readonly WorkHours Standard = new WorkHours(9 * 60, 18 * 60, new[] { 2, 3, 4, 5, 6 });
@@ -85,34 +86,32 @@ namespace KeepMeOn.Core
         public WorkHours WithDay(int weekday, bool included) =>
             new WorkHours(StartMinute, EndMinute, included ? weekdays.Append(weekday) : weekdays.Where(day => day != weekday));
 
-        public static string ShortName(int weekday) => ShortNames[weekday - 1];
+        public static string ShortName(int weekday, Language language) =>
+            (language == Language.Italian ? ItalianShortNames : EnglishShortNames)[weekday - 1];
 
         public static string TimeString(int minute) => $"{minute / 60:00}:{minute % 60:00}";
 
-        /// <summary>Descrizione breve, es. "lun–ven, 09:00–18:00".</summary>
-        public string Summary => $"{DaysSummary}, {HoursSummary}";
+        /// <summary>Descrizione breve, es. "Mon–Fri, 09:00–18:00" o "lun–ven, 09:00–18:00".</summary>
+        public string Summary(Language language) => $"{DaysSummary(language)}, {HoursSummary(language)}";
 
-        internal string DaysSummary
+        internal string DaysSummary(Language language)
         {
-            get
-            {
-                var days = MondayFirst.Where(weekdays.Contains).ToList();
-                if (days.Count == 0) return "nessun giorno";
-                if (days.Count == 7) return "tutti i giorni";
+            var days = MondayFirst.Where(weekdays.Contains).ToList();
+            if (days.Count == 0) return language.Pick("no days", "nessun giorno");
+            if (days.Count == 7) return language.Pick("every day", "tutti i giorni");
 
-                // Tre o più giorni consecutivi diventano un intervallo ("lun–ven").
-                var positions = days.Select(day => MondayFirst.ToList().IndexOf(day)).ToList();
-                bool isRun = positions[positions.Count - 1] - positions[0] == positions.Count - 1;
-                if (isRun && days.Count >= 3)
-                {
-                    return $"{ShortName(days[0])}–{ShortName(days[days.Count - 1])}";
-                }
-                return string.Join(", ", days.Select(ShortName));
+            // Tre o più giorni consecutivi diventano un intervallo ("lun–ven").
+            var positions = days.Select(day => MondayFirst.ToList().IndexOf(day)).ToList();
+            bool isRun = positions[positions.Count - 1] - positions[0] == positions.Count - 1;
+            if (isRun && days.Count >= 3)
+            {
+                return $"{ShortName(days[0], language)}–{ShortName(days[days.Count - 1], language)}";
             }
+            return string.Join(", ", days.Select(day => ShortName(day, language)));
         }
 
-        internal string HoursSummary =>
-            StartMinute == EndMinute ? "tutto il giorno" : $"{TimeString(StartMinute)}–{TimeString(EndMinute)}";
+        internal string HoursSummary(Language language) =>
+            StartMinute == EndMinute ? language.Pick("all day", "tutto il giorno") : $"{TimeString(StartMinute)}–{TimeString(EndMinute)}";
 
         public bool Equals(WorkHours other) =>
             other != null && StartMinute == other.StartMinute && EndMinute == other.EndMinute && weekdays.SetEquals(other.weekdays);

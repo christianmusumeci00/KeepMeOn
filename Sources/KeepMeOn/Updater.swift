@@ -33,15 +33,16 @@ final class Updater: NSObject, ObservableObject {
         var errorDescription: String? {
             switch self {
             case .badResponse(let status):
-                return "GitHub ha risposto con il codice \(status)."
+                return tr("GitHub responded with code \(status).", "GitHub ha risposto con il codice \(status).")
             case .notWritable(let folder):
-                return "Non posso scrivere nella cartella \(folder)."
+                return tr("Can't write to the folder \(folder).", "Non posso scrivere nella cartella \(folder).")
             case .missingApp:
-                return "Il file scaricato non contiene KeepMeOn."
+                return tr("The downloaded file doesn't contain KeepMeOn.", "Il file scaricato non contiene KeepMeOn.")
             case .signatureMismatch:
-                return "La nuova versione non è firmata dallo stesso sviluppatore di quella installata."
+                return tr("The new version isn't signed by the same developer as the installed one.",
+                          "La nuova versione non è firmata dallo stesso sviluppatore di quella installata.")
             case .commandFailed(let command):
-                return "Il comando \(command) non è riuscito."
+                return tr("The \(command) command failed.", "Il comando \(command) non è riuscito.")
             }
         }
     }
@@ -151,13 +152,13 @@ final class Updater: NSObject, ObservableObject {
             throw UpdateError.notWritable(folder.path)
         }
 
-        showProgress("Download di KeepMeOn \(version.description)…")
+        showProgress(tr("Downloading KeepMeOn \(version.description)…", "Download di KeepMeOn \(version.description)…"))
         let (download, _) = try await URLSession.shared.download(from: asset.downloadURL)
         let dmg = FileManager.default.temporaryDirectory.appendingPathComponent("KeepMeOn-\(version.description).dmg")
         try? FileManager.default.removeItem(at: dmg)
         try FileManager.default.moveItem(at: download, to: dmg)
 
-        progress.status = "Verifica e installazione…"
+        progress.status = tr("Verifying and installing…", "Verifica e installazione…")
         let staged = try await Task.detached(priority: .userInitiated) {
             try Updater.stage(dmg: dmg, nextTo: bundle)
         }.value
@@ -245,11 +246,13 @@ final class Updater: NSObject, ObservableObject {
     private func askToInstall(version: AppVersion, release: ReleaseInfo) -> Bool {
         while true {
             let alert = NSAlert()
-            alert.messageText = "È disponibile KeepMeOn \(version.description)"
-            alert.informativeText = "Hai la versione \(currentVersion.description). L'aggiornamento si scarica da GitHub e si installa da solo, poi KeepMeOn si riapre. Impostazioni e permessi restano."
-            alert.addButton(withTitle: "Installa e riavvia")
-            alert.addButton(withTitle: "Più tardi")
-            alert.addButton(withTitle: "Novità…")
+            alert.messageText = tr("KeepMeOn \(version.description) is available", "È disponibile KeepMeOn \(version.description)")
+            alert.informativeText = tr(
+                "You have version \(currentVersion.description). The update downloads from GitHub and installs itself, then KeepMeOn reopens. Your settings and permissions are kept.",
+                "Hai la versione \(currentVersion.description). L'aggiornamento si scarica da GitHub e si installa da solo, poi KeepMeOn si riapre. Impostazioni e permessi restano.")
+            alert.addButton(withTitle: tr("Install and Relaunch", "Installa e riavvia"))
+            alert.addButton(withTitle: tr("Later", "Più tardi"))
+            alert.addButton(withTitle: tr("What's New…", "Novità…"))
             NSApp.activateIgnoringOtherAppsIfNeeded()
             switch alert.runModal() {
             case .alertFirstButtonReturn:
@@ -264,8 +267,9 @@ final class Updater: NSObject, ObservableObject {
 
     private func showUpToDate() {
         let alert = NSAlert()
-        alert.messageText = "KeepMeOn è aggiornata"
-        alert.informativeText = "Hai l'ultima versione disponibile, la \(currentVersion.description)."
+        alert.messageText = tr("KeepMeOn is up to date", "KeepMeOn è aggiornata")
+        alert.informativeText = tr("You have the latest version, \(currentVersion.description).",
+                                   "Hai l'ultima versione disponibile, la \(currentVersion.description).")
         NSApp.activateIgnoringOtherAppsIfNeeded()
         alert.runModal()
     }
@@ -273,9 +277,11 @@ final class Updater: NSObject, ObservableObject {
     private func showError(_ error: Error) {
         let alert = NSAlert()
         alert.alertStyle = .warning
-        alert.messageText = "Aggiornamento non riuscito"
-        alert.informativeText = "\(error.localizedDescription)\n\nPuoi scaricare l'ultima versione dalla pagina di KeepMeOn su GitHub."
-        alert.addButton(withTitle: "Apri GitHub")
+        alert.messageText = tr("Update failed", "Aggiornamento non riuscito")
+        alert.informativeText = error.localizedDescription + "\n\n" + tr(
+            "You can download the latest version from the KeepMeOn page on GitHub.",
+            "Puoi scaricare l'ultima versione dalla pagina di KeepMeOn su GitHub.")
+        alert.addButton(withTitle: tr("Open GitHub", "Apri GitHub"))
         alert.addButton(withTitle: "OK")
         NSApp.activateIgnoringOtherAppsIfNeeded()
         if alert.runModal() == .alertFirstButtonReturn {
@@ -287,7 +293,7 @@ final class Updater: NSObject, ObservableObject {
         progress.status = status
         if progressWindow == nil {
             let window = NSWindow(contentViewController: NSHostingController(rootView: UpdateProgressView(progress: progress)))
-            window.title = "Aggiornamento di KeepMeOn"
+            window.title = tr("Updating KeepMeOn", "Aggiornamento di KeepMeOn")
             window.styleMask = [.titled]
             window.isReleasedWhenClosed = false
             window.center()

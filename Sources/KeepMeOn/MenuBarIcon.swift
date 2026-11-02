@@ -53,10 +53,12 @@ enum MenuBarIcon {
     @MainActor
     static func confirmHide() {
         let alert = NSAlert()
-        alert.messageText = "Nascondere l'icona?"
-        alert.informativeText = "KeepMeOn continuerà a funzionare senza nulla di visibile. Per far ricomparire l'icona riapri KeepMeOn da Spotlight o dalla cartella Applicazioni."
-        alert.addButton(withTitle: "Nascondi")
-        alert.addButton(withTitle: "Annulla")
+        alert.messageText = tr("Hide the icon?", "Nascondere l'icona?")
+        alert.informativeText = tr(
+            "KeepMeOn will keep working with nothing visible. To bring the icon back, open KeepMeOn again from Spotlight or the Applications folder.",
+            "KeepMeOn continuerà a funzionare senza nulla di visibile. Per far ricomparire l'icona riapri KeepMeOn da Spotlight o dalla cartella Applicazioni.")
+        alert.addButton(withTitle: tr("Hide", "Nascondi"))
+        alert.addButton(withTitle: tr("Cancel", "Annulla"))
         NSApp.activateIgnoringOtherAppsIfNeeded()
         if alert.runModal() == .alertFirstButtonReturn {
             UserDefaults.standard.set(false, forKey: visibleKey)

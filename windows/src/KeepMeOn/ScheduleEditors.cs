@@ -29,7 +29,7 @@ namespace KeepMeOn
             days = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0, 3, 0, 3) };
             foreach (int day in WorkHours.MondayFirst)
             {
-                string name = WorkHours.ShortName(day);
+                string name = WorkHours.ShortName(day, L10n.Current);
                 var box = new CheckBox
                 {
                     Text = char.ToUpperInvariant(name[0]) + name.Substring(1),
@@ -42,9 +42,9 @@ namespace KeepMeOn
             }
             note = Ui.Paragraph("", noteWidth, Ui.SecondaryText, new Padding(0, 6, 0, 0));
 
-            Editors.AddRow(this, "Inizio:", start);
-            Editors.AddRow(this, "Fine:", end);
-            Editors.AddRow(this, "Giorni:", days);
+            Editors.AddRow(this, L10n.T("Start:", "Inizio:"), start);
+            Editors.AddRow(this, L10n.T("End:", "Fine:"), end);
+            Editors.AddRow(this, L10n.T("Days:", "Giorni:"), days);
             Editors.AddRow(this, null, note);
 
             start.ValueChanged += (sender, e) => { controller.WorkHours = controller.WorkHours.WithStart(Editors.MinuteOf(start)); UpdateNote(); };
@@ -60,14 +60,17 @@ namespace KeepMeOn
         private void UpdateNote()
         {
             var hours = controller.WorkHours;
-            string text = "Fuori fascia KeepMeOn resta acceso ma non interviene.";
+            string text = L10n.T("Outside these hours KeepMeOn stays on but doesn't step in.",
+                                 "Fuori fascia KeepMeOn resta acceso ma non interviene.");
             if (hours.StartMinute == hours.EndMinute)
             {
-                text += " Inizio e fine coincidono: la fascia copre l'intera giornata.";
+                text += " " + L10n.T("Start and end are the same: the range covers the whole day.",
+                                     "Inizio e fine coincidono: la fascia copre l'intera giornata.");
             }
             else if (hours.StartMinute > hours.EndMinute)
             {
-                text += " La fascia termina il giorno dopo, come un turno di notte.";
+                text += " " + L10n.T("The range ends the next day, like a night shift.",
+                                     "La fascia termina il giorno dopo, come un turno di notte.");
             }
             note.Text = text;
         }
@@ -88,8 +91,8 @@ namespace KeepMeOn
 
             start = Editors.TimePicker(controller.LunchBreak.StartMinute);
             end = Editors.TimePicker(controller.LunchBreak.EndMinute);
-            Editors.AddRow(this, "Dalle:", start);
-            Editors.AddRow(this, "Alle:", end);
+            Editors.AddRow(this, L10n.T("From:", "Dalle:"), start);
+            Editors.AddRow(this, L10n.T("To:", "Alle:"), end);
 
             start.ValueChanged += (sender, e) => controller.LunchBreak = controller.LunchBreak.WithStart(Editors.MinuteOf(start));
             end.ValueChanged += (sender, e) => controller.LunchBreak = controller.LunchBreak.WithEnd(Editors.MinuteOf(end));

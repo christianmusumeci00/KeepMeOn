@@ -94,17 +94,18 @@ namespace KeepMeOn.Probe
 
             string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "KeepMeOn");
             string exe = Path.Combine(folder, "KeepMeOn.exe");
-            foreach (bool startup in new[] { false, true })
+            foreach (var (startup, language) in new[] { (false, Language.Italian), (true, Language.English) })
             {
-                var install = Process.Start(new ProcessStartInfo(Path.GetFullPath(setup), Updater.InstallerArguments(startup)) { UseShellExecute = false });
+                var install = Process.Start(new ProcessStartInfo(Path.GetFullPath(setup), Updater.InstallerArguments(startup, language)) { UseShellExecute = false });
                 install.WaitForExit();
                 Thread.Sleep(4000);
                 bool installed = File.Exists(exe);
                 bool runKey = RunKeyPresent();
+                Language? savedLanguage = new SettingsStore().Language;
                 var running = Process.GetProcessesByName("KeepMeOn");
-                Console.WriteLine($"Installazione silenziosa, avvio all'accesso {(startup ? "sì" : "no")}: uscita {install.ExitCode}, " +
-                                  $"installata={installed}, avvio all'accesso={runKey}, riaperta={running.Length > 0}");
-                ok &= install.ExitCode == 0 && installed && runKey == startup && running.Length > 0;
+                Console.WriteLine($"Installazione silenziosa, avvio all'accesso {(startup ? "sì" : "no")}, lingua {language.Code()}: uscita {install.ExitCode}, " +
+                                  $"installata={installed}, avvio all'accesso={runKey}, lingua salvata={savedLanguage?.Code() ?? "nessuna"}, riaperta={running.Length > 0}");
+                ok &= install.ExitCode == 0 && installed && runKey == startup && savedLanguage == language && running.Length > 0;
                 foreach (var process in running)
                 {
                     process.Kill();

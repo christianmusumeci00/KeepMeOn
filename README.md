@@ -1,37 +1,39 @@
 <p align="center">
-  <img src="docs/icona.png" width="128" alt="Icona di KeepMeOn">
+  <img src="docs/icona.png" width="128" alt="KeepMeOn icon">
 </p>
 
 <h1 align="center">KeepMeOn</h1>
 
 <p align="center">
-  Resta disponibile su Microsoft Teams anche quando ti allontani per un attimo.
+  Stay available on Microsoft Teams even when you step away for a moment.
 </p>
 
 <p align="center">
-  <a href="https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn.dmg"><b>Scarica per Mac</b></a>
+  <a href="https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn.dmg"><b>Download for Mac</b></a>
   ·
-  <a href="https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn-Setup.exe"><b>Scarica per Windows</b></a>
+  <a href="https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn-Setup.exe"><b>Download for Windows</b></a>
   ·
-  <a href="#installazione">Installazione</a>
+  <a href="#installation">Installation</a>
   ·
-  <a href="#compilare-da-zero">Compilare da zero</a>
+  <a href="#building-from-source">Building from source</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-13%2B-black" alt="macOS 13+">
-  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4" alt="Windows 10 e 11">
-  <img src="https://img.shields.io/badge/licenza-MIT-green" alt="Licenza MIT">
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4" alt="Windows 10 and 11">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
 </p>
 
 ---
 
-Ti alzi per un caffè, rispondi al citofono o vai a ritirare una stampa. Dopo circa 5 minuti senza mouse e tastiera, Teams ti segna **«Assente»**, anche se stai per tornare. KeepMeOn tiene il computer "presente" durante queste brevi pause, così resti **verde** e i colleghi sanno che sei raggiungibile.
+You get up for a coffee, answer the door or grab a printout. After about 5 minutes without mouse or keyboard, Teams marks you as **"Away"**, even though you're about to come back. KeepMeOn keeps your computer "present" during these short breaks, so you stay **green** and your colleagues know they can reach you.
 
-È una piccola app nativa, senza dipendenze esterne:
+It's a small native app with no external dependencies:
 
-- **Mac:** vive nella barra dei menu. È scritta in Swift e SwiftUI, occupa meno di 1 MB e a riposo usa circa 17 MB di memoria.
-- **Windows:** vive nell'area di notifica, vicino all'orologio. È scritta in C# con Windows Forms su .NET Framework 4.8, già presente in Windows 10 e 11, quindi non c'è nulla in più da installare. L'installer pesa circa 2 MB.
+- **Mac:** lives in the menu bar. It's written in Swift and SwiftUI, takes up less than 1 MB and uses about 17 MB of memory at rest.
+- **Windows:** lives in the notification area, next to the clock. It's written in C# with Windows Forms on .NET Framework 4.8, which already ships with Windows 10 and 11, so there's nothing extra to install. The installer is about 2 MB.
+
+The app is available in **English** (default) and **Italian**.
 
 <table>
   <tr>
@@ -39,111 +41,113 @@ Ti alzi per un caffè, rispondi al citofono o vai a ritirare una stampa. Dopo ci
     <th>Windows</th>
   </tr>
   <tr>
-    <td><img src="docs/benvenuto.png" width="400" alt="Configurazione guidata su Mac: benvenuto"></td>
-    <td><img src="docs/windows/benvenuto.png" width="400" alt="Configurazione guidata su Windows: benvenuto"></td>
+    <td><img src="docs/benvenuto.png" width="400" alt="Guided setup on Mac: welcome"></td>
+    <td><img src="docs/windows/benvenuto.png" width="400" alt="Guided setup on Windows: welcome"></td>
   </tr>
 </table>
 
-## Cosa fa
+## What it does
 
-- **Interviene solo quando non usi il computer.** Ogni 60 secondi controlla da quanto tempo non tocchi mouse, tastiera o trackpad, e agisce solo oltre i 2 minuti. Mentre lavori non fa nulla.
-- **Non tocca niente.** Non muove il mouse, non preme tasti, non clicca e non apre niente: invia soltanto un segnale neutro al sistema (vedi [Come funziona](#come-funziona)).
-- **Si ferma da sola** in quattro casi:
-  - con lo schermo bloccato;
-  - con il computer in stop o lo schermo spento;
-  - fuori dall'orario di lavoro, se lo imposti;
-  - durante la pausa pranzo, se la attivi.
-- **Orario di lavoro:** ora di inizio e di fine e giorni della settimana (predefinito lun–ven, 09:00–18:00). Funzionano anche le fasce a cavallo della mezzanotte.
-- **Pausa pranzo:** una fascia giornaliera in cui l'app non interviene (predefinita 13:00–14:00).
-- **Configurazione guidata** al primo avvio: in pochi passi scegli quando deve funzionare, la pausa pranzo, l'avvio automatico e gli aggiornamenti.
-- **Aggiornamenti con un clic:** dal menu dell'icona, oppure in automatico una volta al giorno (si può disattivare).
-- **Avvio automatico** e possibilità di **nascondere l'icona**: KeepMeOn può lavorare senza nulla di visibile.
-- **Non raccoglie dati.** Le impostazioni restano sul tuo computer. Si collega a Internet solo per controllare su GitHub se c'è una nuova versione, e solo se gli aggiornamenti automatici sono attivi o lo chiedi tu.
+- **It only steps in when you're not using the computer.** Every 60 seconds it checks how long you haven't touched the mouse, keyboard or trackpad, and acts only past 2 minutes. While you work, it does nothing.
+- **Hands off.** It doesn't move the mouse, press keys, click or open anything: it only sends a neutral signal to the system (see [How it works](#how-it-works)).
+- **Stops on its own** in four cases:
+  - when the screen is locked;
+  - when the computer is asleep or the display is off;
+  - outside work hours, if you set them;
+  - during the lunch break, if you turn it on.
+- **Work hours:** start and end time and days of the week (default Mon–Fri, 09:00–18:00). Ranges that cross midnight work too.
+- **Lunch break:** a daily range in which the app doesn't step in (default 13:00–14:00).
+- **Guided setup** on first launch: in a few steps you choose the language, when it should run, the lunch break, startup and updates.
+- **English or Italian:** choose the language in the Windows installer, in the guided setup or in the settings. It changes immediately, no restart needed.
+- **One-click updates:** from the icon menu, or automatically once a day (can be turned off).
+- **Start at login** and the option to **hide the icon**: KeepMeOn can work with nothing visible.
+- **No data collection.** Settings stay on your computer. It only connects to the Internet to check GitHub for a new version, and only if automatic updates are on or you ask it to.
 
-Se ti allontani a lungo, blocca il computer (**⌃⌘Q** su Mac, **Windows+L** su Windows): KeepMeOn si mette in pausa e Teams mostra correttamente che sei assente.
+If you're stepping away for longer, lock your computer (**⌃⌘Q** on Mac, **Windows+L** on Windows): KeepMeOn pauses and Teams correctly shows that you're away.
 
-## Installazione
+## Installation
 
-### Mac (macOS 13 Ventura o successivo)
+### Mac (macOS 13 Ventura or later)
 
-1. Scarica **[KeepMeOn.dmg](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn.dmg)**.
-2. Apri il DMG e trascina **KeepMeOn** nella cartella **Applicazioni**.
-3. Apri **KeepMeOn** da Applicazioni o da Spotlight. L'app è firmata con un certificato Developer ID e notarizzata da Apple, quindi si apre con un doppio clic. Visto che arriva da Internet, macOS chiede una sola conferma: premi **Apri**.
-4. Si apre la **configurazione guidata**. Segui i passi con **Avanti**:
-   1. **Permesso di Accessibilità:** premi **Apri Impostazioni Accessibilità** e attiva **KeepMeOn** nell'elenco. L'app si riavvia da sola, perché macOS applica questo permesso solo all'avvio, e la guida riprende da dove eri rimasto.
-   2. **Quando deve funzionare:** sempre, oppure solo in orario di lavoro, con orari e giorni.
-   3. **Pausa pranzo:** se KeepMeOn deve fermarsi e in quale fascia.
-   4. **Avvio e aggiornamenti:** avvio al login e controllo automatico degli aggiornamenti.
-5. Nel riepilogo premi **Inizia**.
+1. Download **[KeepMeOn.dmg](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn.dmg)**.
+2. Open the DMG and drag **KeepMeOn** into the **Applications** folder.
+3. Open **KeepMeOn** from Applications or Spotlight. The app is signed with a Developer ID certificate and notarized by Apple, so it opens with a double-click. Since it comes from the Internet, macOS asks for a single confirmation: click **Open**.
+4. The **guided setup** opens. On the first screen, choose the **language** at the bottom left, then go through the steps with **Next**:
+   1. **Accessibility permission:** click **Open Accessibility Settings** and turn on **KeepMeOn** in the list. The app relaunches on its own, because macOS only applies this permission at launch, and the setup picks up where you left off.
+   2. **When it should run:** always, or only during work hours, with times and days.
+   3. **Lunch break:** whether KeepMeOn should stop, and during which range.
+   4. **Startup and updates:** launch at login and automatic update checks.
+5. On the summary, click **Get Started**.
 
-Nella barra dei menu compare una tazzina.
+A coffee cup appears in the menu bar.
 
-### Windows (Windows 10 e 11)
+### Windows (Windows 10 and 11)
 
-1. Scarica **[KeepMeOn-Setup.exe](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn-Setup.exe)** e avvialo.
-2. L'installer non è firmato con un certificato a pagamento, quindi la prima volta Windows mostra «Windows ha protetto il PC». Clicca **Ulteriori informazioni** › **Esegui comunque**.
-3. L'installazione è solo per il tuo utente: non servono permessi di amministratore. Se vuoi, lascia attiva l'opzione «Avvia KeepMeOn all'accesso a Windows».
-4. Si apre la **configurazione guidata**: scegli quando deve funzionare, la pausa pranzo, l'avvio all'accesso e gli aggiornamenti, poi premi **Inizia**. Su Windows non c'è nessun permesso da concedere.
+1. Download **[KeepMeOn-Setup.exe](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn-Setup.exe)** and run it.
+2. The installer isn't signed with a paid certificate, so the first time Windows shows "Windows protected your PC". Click **More info** › **Run anyway**.
+3. Choose the **language** (English or Italiano): the installer and the app will use it.
+4. The installation is for your user only: no administrator rights needed. If you like, leave the "Start KeepMeOn when you sign in to Windows" option on.
+5. The **guided setup** opens: choose when it should run, the lunch break, startup at sign-in and updates, then click **Get Started**. On Windows there's no permission to grant.
 
-La tazzina compare nell'area di notifica, vicino all'orologio. Se non la vedi, apri la freccia «Mostra icone nascoste» e trascinala sulla barra delle applicazioni.
+The cup appears in the notification area, next to the clock. If you don't see it, open the "Show hidden icons" arrow and drag it onto the taskbar.
 
-## Uso
+## Usage
 
-### L'icona
+### The icon
 
 <table>
   <tr>
-    <th>Mac, barra dei menu</th>
-    <th>Windows, area di notifica</th>
+    <th>Mac, menu bar</th>
+    <th>Windows, notification area</th>
   </tr>
   <tr>
-    <td><img src="docs/barra-dei-menu.png" width="300" alt="Le tre varianti dell'icona su Mac, su barra chiara e scura"></td>
-    <td><img src="docs/windows/area-di-notifica.png" width="300" alt="Le tre varianti dell'icona su Windows, su barra chiara e scura"></td>
+    <td><img src="docs/barra-dei-menu.png" width="300" alt="The three icon variants on Mac, on a light and dark bar"></td>
+    <td><img src="docs/windows/area-di-notifica.png" width="300" alt="The three icon variants on Windows, on a light and dark bar"></td>
   </tr>
 </table>
 
-| Icona | Significato |
+| Icon | Meaning |
 |---|---|
-| Tazzina vuota (Mac) o grigia (Windows) | KeepMeOn è spenta |
-| Tazzina senza spunta | Accesa ma in pausa: pranzo, fuori orario, schermo bloccato (su Mac anche permesso mancante) |
-| Tazzina con spunta | Ti sta tenendo verde |
+| Empty cup (Mac) or gray cup (Windows) | KeepMeOn is off |
+| Cup without a checkmark | On but paused: lunch, outside work hours, screen locked (on Mac also missing permission) |
+| Cup with a checkmark | Keeping you green |
 
-### Il menu
+### The menu
 
-Su Mac si apre dalla tazzina nella barra dei menu; su Windows con un clic, sinistro o destro, sulla tazzina vicino all'orologio.
+On Mac it opens from the cup in the menu bar; on Windows with a click, left or right, on the cup next to the clock.
 
 <p align="center">
-  <img src="docs/windows/menu.png" width="230" alt="Il menu su Windows">
+  <img src="docs/windows/menu.png" width="230" alt="The menu on Windows">
 </p>
 
-| Voce | Cosa fa |
+| Item | What it does |
 |---|---|
-| Stato | Per esempio "Attivo – controllo ogni 60 s", "In pausa – pausa pranzo", "In pausa – schermo bloccato" |
-| Ultimo intervento | Ora dell'ultima volta in cui KeepMeOn è intervenuta |
-| Concedi il permesso di Accessibilità… | Solo su Mac, e solo se il permesso manca |
-| Attivo | Accende o spegne l'app |
-| Intervallo di controllo | 30, 60, 120 o 240 secondi (predefinito 60) |
-| Solo in orario di lavoro | Limita l'azione alla fascia oraria |
-| Pausa pranzo | Ferma l'app nella fascia della pausa, tutti i giorni |
-| Imposta orari… | Apre la finestra con orario di lavoro e pausa pranzo |
-| Avvia al login (Mac) / Avvia all'accesso a Windows | Avvia KeepMeOn all'accesso al computer |
-| Nascondi icona… | Toglie l'icona. Per riaverla riapri KeepMeOn: su Mac da Spotlight o Applicazioni, su Windows dal menu Start |
-| Configurazione guidata… | Riapre la configurazione guidata dall'inizio |
-| Controlla aggiornamenti… | Cerca subito una nuova versione su GitHub |
-| Aggiornamenti automatici | Controlla da solo una volta al giorno (attivo di serie) |
-| KeepMeOn 1.2.0 | La versione installata |
-| Esci | Chiude l'app |
+| Status | For example "Active – checking every 60 s", "Paused – lunch break", "Paused – screen locked" |
+| Last action at… | The last time KeepMeOn stepped in |
+| Grant Accessibility Permission… | Mac only, and only if the permission is missing |
+| Enabled | Turns the app on or off |
+| Check Interval | 30, 60, 120 or 240 seconds (default 60) |
+| Work Hours Only | Limits the app to the time range |
+| Lunch Break | Stops the app during the break, every day |
+| Settings… | Opens the window with language, work hours and lunch break |
+| Launch at Login (Mac) / Start with Windows (Windows) | Starts KeepMeOn when you sign in to the computer |
+| Hide Icon… | Removes the icon. To get it back, open KeepMeOn again: on Mac from Spotlight or Applications, on Windows from the Start menu |
+| Guided Setup… | Reopens the guided setup from the beginning |
+| Check for Updates… | Looks for a new version on GitHub right away |
+| Automatic Updates | Checks on its own once a day (on by default) |
+| KeepMeOn 1.2.0 | The installed version |
+| Quit (Mac) / Exit (Windows) | Closes the app |
 
-### Aggiornamenti
+### Updates
 
-Quando c'è una nuova versione, KeepMeOn chiede se installarla: con **Installa e riavvia** la scarica, la installa e si riapre da sola. Impostazioni e permessi restano; con **Novità…** (su Windows «Leggi le novità») vedi cosa cambia.
+When a new version is available, KeepMeOn asks whether to install it: **Install and Relaunch** downloads it, installs it and reopens the app on its own. Settings, language and permissions are kept; **What's New…** (on Windows "Read what's new") shows what changed.
 
-- **Mac:** prima di installare, KeepMeOn verifica che la nuova app sia firmata dallo stesso sviluppatore di quella in uso; se non lo è, l'aggiornamento viene rifiutato. Serve che KeepMeOn possa scrivere nella cartella in cui si trova, per esempio Applicazioni.
-- **Windows:** l'installer della nuova versione parte senza finestre e mantiene la tua scelta sull'avvio all'accesso.
+- **Mac:** before installing, KeepMeOn checks that the new app is signed by the same developer as the one in use; if it isn't, the update is rejected. KeepMeOn must be able to write to the folder it's in, for example Applications.
+- **Windows:** the new version's installer runs without windows and keeps your choices for startup at sign-in and language.
 
-Il controllo automatico è una semplice richiesta all'indirizzo pubblico delle release su GitHub: non invia nessun dato personale.
+The automatic check is a simple request to the public GitHub releases address: it doesn't send any personal data.
 
-### Orari
+### Settings
 
 <table>
   <tr>
@@ -151,56 +155,71 @@ Il controllo automatico è una semplice richiesta all'indirizzo pubblico delle r
     <th>Windows</th>
   </tr>
   <tr>
-    <td><img src="docs/orari.png" width="400" alt="Finestra degli orari su Mac"></td>
-    <td><img src="docs/windows/orari.png" width="400" alt="Finestra degli orari su Windows"></td>
+    <td><img src="docs/orari.png" width="400" alt="Settings window on Mac"></td>
+    <td><img src="docs/windows/orari.png" width="400" alt="Settings window on Windows"></td>
   </tr>
 </table>
 
-- Nell'orario di lavoro l'inizio è incluso e la fine esclusa: 09:00–18:00 vale fino alle 17:59.
-- Se la fine viene prima dell'inizio (per esempio 22:00–06:00), la fascia scavalca la mezzanotte e conta per il giorno in cui è iniziata. Se inizio e fine coincidono, copre l'intera giornata.
-- La pausa pranzo vale tutti i giorni; se inizio e fine coincidono è vuota.
+- **Language:** English or Italiano. Menu and open windows switch right away.
+- In work hours the start is included and the end excluded: 09:00–18:00 lasts until 17:59.
+- If the end comes before the start (for example 22:00–06:00), the range crosses midnight and counts for the day it started. If start and end are the same, it covers the whole day.
+- The lunch break applies every day; if start and end are the same, it's empty.
 
-## Come funziona
+The language can also be set from the command line, then restart the app.
 
-Teams va in «Assente» dopo circa 5 minuti in cui il contatore di inattività del sistema non si azzera. A ogni controllo, se non usi il computer da almeno 120 secondi, KeepMeOn fa due cose: chiede al sistema di restare sveglio e azzera quel contatore con un segnale neutro.
+On Mac:
 
-Servono entrambe le cose, su Mac come su Windows. La sola funzione "tieni sveglio" del sistema non azzera il contatore che legge Teams: è stato verificato su entrambi i sistemi.
+```bash
+defaults write com.keepmeon.app language it   # or en
+```
+
+On Windows:
+
+```bat
+reg add HKCU\Software\KeepMeOn /v Language /t REG_SZ /d it /f
+```
+
+## How it works
+
+Teams goes "Away" after about 5 minutes in which the system's idle timer isn't reset. At each check, if you haven't used the computer for at least 120 seconds, KeepMeOn does two things: it asks the system to stay awake and it resets that timer with a neutral signal.
+
+Both are needed, on Mac as on Windows. The system's "stay awake" function alone doesn't reset the timer that Teams reads: this was verified on both systems.
 
 ### Mac
 
-1. **Dichiara attività a macOS** con `IOPMAssertionDeclareUserActivity`: il sistema rimanda stop dello schermo, salvaschermo e stop del Mac.
-2. **Azzera il contatore che legge Teams** (`CGEventSourceSecondsSinceLastEventType(combinedSessionState, …)`) con un evento `flagsChanged` "modificatori invariati". Per le app è come se lasciassi andare un tasto ⌘ ⌥ ⇧ ⌃ che non stavi premendo: nessun cursore, nessun carattere, nessun clic.
-   - L'evento porta gli stessi modificatori già attivi (al massimo Blocco maiuscole) e non parte se un modificatore risulta premuto.
-   - È marcato con l'identificativo `KMON`, quindi si riconosce.
-   - Inviare eventi su macOS richiede il permesso di Accessibilità.
+1. **Declares activity to macOS** with `IOPMAssertionDeclareUserActivity`: the system postpones display sleep, the screen saver and Mac sleep.
+2. **Resets the timer that Teams reads** (`CGEventSourceSecondsSinceLastEventType(combinedSessionState, …)`) with an "unchanged modifiers" `flagsChanged` event. To apps, it's as if you released a ⌘ ⌥ ⇧ ⌃ key you weren't pressing: no cursor, no character, no click.
+   - The event carries the same modifiers that are already active (at most Caps Lock) and isn't sent if a modifier is held down.
+   - It's tagged with the `KMON` identifier, so it can be recognized.
+   - Posting events on macOS requires the Accessibility permission.
 
 ### Windows
 
-1. **Chiede a Windows di restare sveglio** con `SetThreadExecutionState`: rimanda sospensione e spegnimento dello schermo.
-2. **Azzera il contatore di inattività** (`GetLastInputInfo`) con `SendInput`, comunicando il rilascio di un tasto che non esiste: il codice virtuale 0x97, che Windows non assegna a nulla. Nessuna app ci reagisce e il cursore non si muove. Anche questo segnale è marcato `KMON`.
-   - Su Windows non serve nessun permesso.
+1. **Asks Windows to stay awake** with `SetThreadExecutionState`: it postpones sleep and display power-off.
+2. **Resets the idle timer** (`GetLastInputInfo`) with `SendInput`, reporting the release of a key that doesn't exist: virtual key code 0x97, which Windows doesn't assign to anything. No app reacts to it and the cursor doesn't move. This signal is also tagged `KMON`.
+   - On Windows no permission is needed.
 
-Su un computer con Windows 11 il segnale ha portato il contatore da 144 s a 0,3 s senza muovere il cursore, mentre la sola `SetThreadExecutionState` non lo azzerava.
+On a Windows 11 computer the signal brought the timer from 144 s to 0.3 s without moving the cursor, while `SetThreadExecutionState` alone didn't reset it.
 
-### Tempi e soglia
+### Timing and threshold
 
-Con i valori predefiniti il contatore non supera i 3 minuti circa: in una misura di 7 minuti e mezzo senza input su Mac è arrivato al massimo a 181 s, sotto i 300 s di Teams. Con l'intervallo di 240 s la soglia scende da sola a 21 s, così non si arriva mai ai 5 minuti.
+With the default values the timer doesn't go beyond about 3 minutes: in a 7.5-minute measurement without input on Mac it peaked at 181 s, below Teams' 300 s. With the 240 s interval, the threshold drops on its own to 21 s, so it never reaches 5 minutes.
 
-La soglia di 120 s si può cambiare, poi va riavviata l'app.
+The 120 s threshold can be changed; then restart the app.
 
-Su Mac:
+On Mac:
 
 ```bash
 defaults write com.keepmeon.app idleThresholdSeconds -int 90
 ```
 
-Su Windows:
+On Windows:
 
 ```bat
 reg add HKCU\Software\KeepMeOn /v IdleThresholdSeconds /t REG_DWORD /d 90 /f
 ```
 
-## Compilare da zero
+## Building from source
 
 ```bash
 git clone https://github.com/christianmusumeci00/KeepMeOn.git
@@ -209,133 +228,141 @@ cd KeepMeOn
 
 ### Mac
 
-**Requisiti:**
-- macOS 13 Ventura o successivo.
-- Xcode 15 o successivo, oppure i Command Line Tools con Swift 5.9 o successivo. I test (`swift test`) e la build universale potrebbero richiedere Xcode completo.
+**Requirements:**
+- macOS 13 Ventura or later.
+- Xcode 15 or later, or the Command Line Tools with Swift 5.9 or later. Tests (`swift test`) and the universal build may require full Xcode.
 
-| Comando | Risultato |
+| Command | Result |
 |---|---|
-| `./build.sh` | `dist/KeepMeOn.app` per l'architettura del tuo Mac |
-| `UNIVERSAL=1 ./build.sh` | `dist/KeepMeOn.app` universale (Apple Silicon e Intel) |
-| `./make-dmg.sh` | `dist/KeepMeOn.dmg` universale, con il collegamento ad Applicazioni (notarizzato se ci sono certificato e credenziali, vedi sotto) |
-| `swift test` | test della logica (orari, pausa pranzo, stato, soglia) |
+| `./build.sh` | `dist/KeepMeOn.app` for your Mac's architecture |
+| `UNIVERSAL=1 ./build.sh` | universal `dist/KeepMeOn.app` (Apple Silicon and Intel) |
+| `./make-dmg.sh` | universal `dist/KeepMeOn.dmg`, with the Applications shortcut (notarized if a certificate and credentials are available, see below) |
+| `swift test` | tests for the logic (hours, lunch break, state, threshold, languages) |
 
-Poi avvia l'app:
+Then launch the app:
 
 ```bash
 open dist/KeepMeOn.app
 ```
 
-**Firma.** `build.sh` sceglie da solo il certificato nel portachiavi, in quest'ordine:
-1. "Developer ID Application": per distribuire. Firma con runtime protetto e marca temporale, come richiede la notarizzazione.
-2. "Apple Development": per l'uso sul proprio Mac.
-3. Se non trova nessuno dei due, firma ad-hoc.
+**Signing.** `build.sh` picks the certificate from the keychain on its own, in this order:
+1. "Developer ID Application": for distribution. Signs with the hardened runtime and a timestamp, as notarization requires.
+2. "Apple Development": for use on your own Mac.
+3. If it finds neither, it signs ad hoc.
 
-Con un certificato macOS riconosce l'app da chi l'ha firmata, quindi il permesso di Accessibilità resta valido anche dopo una nuova build. Con la firma ad-hoc il permesso va ridato dopo ogni build.
+With a certificate, macOS recognizes the app by who signed it, so the Accessibility permission stays valid after a new build. With ad hoc signing, the permission has to be granted again after every build.
 
-Per scegliere la firma a mano:
-
-```bash
-SIGN_IDENTITY=- ./build.sh                     # forza la firma ad-hoc
-SIGN_IDENTITY="Nome del certificato" ./build.sh
-```
-
-**Notarizzazione.** Con un certificato Developer ID, `make-dmg.sh` fa notarizzare da Apple prima l'app e poi il DMG. Poi allega a entrambi il ticket di notarizzazione e controlla che macOS li accetti. Prima salva le credenziali, una volta sola: ti verrà chiesta una [password per le app](https://support.apple.com/it-it/102654) del tuo ID Apple.
+To choose the signature manually:
 
 ```bash
-xcrun notarytool store-credentials "KeepMeOn" --apple-id "il-tuo-id-apple" --team-id "IL_TUO_TEAM_ID"
+SIGN_IDENTITY=- ./build.sh                     # force ad hoc signing
+SIGN_IDENTITY="Certificate name" ./build.sh
 ```
 
-Senza credenziali il DMG viene comunque creato e firmato, ma non notarizzato.
+**Notarization.** With a Developer ID certificate, `make-dmg.sh` has Apple notarize first the app and then the DMG. It then staples the notarization ticket to both and checks that macOS accepts them. Save the credentials first, just once: you'll be asked for an [app-specific password](https://support.apple.com/102654) for your Apple Account.
+
+```bash
+xcrun notarytool store-credentials "KeepMeOn" --apple-id "your-apple-id" --team-id "YOUR_TEAM_ID"
+```
+
+Without credentials the DMG is still created and signed, but not notarized.
 
 ### Windows
 
-**Requisiti:**
-- Per l'app e i test basta il [.NET SDK 10](https://dotnet.microsoft.com/download), su Windows, Mac o Linux: l'app punta a .NET Framework 4.8 e si compila ovunque.
-- Per l'installer servono Windows e [Inno Setup 6](https://jrsoftware.org/isinfo.php).
+**Requirements:**
+- For the app and the tests, the [.NET SDK 10](https://dotnet.microsoft.com/download) is enough, on Windows, Mac or Linux: the app targets .NET Framework 4.8 and builds anywhere.
+- The installer needs Windows and [Inno Setup 6](https://jrsoftware.org/isinfo.php).
 
-| Comando | Risultato |
+| Command | Result |
 |---|---|
-| `dotnet test windows/tests/KeepMeOn.Core.Tests` | test della logica (orari, pausa pranzo, stato, soglia) |
+| `dotnet test windows/tests/KeepMeOn.Core.Tests` | tests for the logic (hours, lunch break, state, threshold, languages) |
 | `dotnet build windows/src/KeepMeOn -c Release` | `windows/src/KeepMeOn/bin/Release/net48/KeepMeOn.exe` |
-| `ISCC.exe windows\installer\KeepMeOn.iss` (su Windows, dopo la build) | `windows/dist/KeepMeOn-Setup.exe` |
+| `ISCC.exe windows\installer\KeepMeOn.iss` (on Windows, after the build) | `windows/dist/KeepMeOn-Setup.exe` |
 
-**Su GitHub.** A ogni modifica della cartella `windows/`, il flusso [`.github/workflows/windows.yml`](.github/workflows/windows.yml) fa tutto su un computer Windows:
-- esegue i test;
-- compila l'app;
-- verifica che il segnale neutro azzeri davvero il contatore di inattività;
-- fotografa le finestre;
-- crea l'installer.
+**On GitHub.** On every change to the `windows/` folder, the [`.github/workflows/windows.yml`](.github/workflows/windows.yml) workflow does everything on a Windows machine:
+- runs the tests;
+- builds the app;
+- checks that the neutral signal really resets the idle timer;
+- takes pictures of the windows;
+- creates the installer;
+- checks the silent installation used by updates, including the language it saves.
 
-Il risultato si scarica dalla pagina della compilazione, con il nome «KeepMeOn-Windows».
+The result can be downloaded from the build page, under the name "KeepMeOn-Windows".
 
-### Icone
+### Icons
 
-Sono disegnate in codice. Lo script crea l'icona per Mac e le icone `.ico` per Windows; va lanciato su un Mac:
+They're drawn in code. The script creates the Mac icon and the `.ico` icons for Windows; run it on a Mac:
 
 ```bash
 swift Support/icon/make-icon.swift
 ```
 
-## Domande frequenti
+### Languages
 
-**Teams è diventato giallo lo stesso.**
-Apri il menu e guarda lo stato:
-- **"manca il permesso"** (solo Mac): il permesso di Accessibilità non è attivo per questa copia dell'app (vedi sotto);
-- **"In pausa":** in quel momento è giusto che KeepMeOn non intervenga;
-- **"Disattivato":** riattiva **Attivo**.
+The texts are in the code, with the English and Italian versions side by side: `tr("Settings", "Impostazioni")` on Mac, `L10n.T("Settings", "Impostazioni")` on Windows. The language is saved in `UserDefaults` (Mac) or in the registry (Windows) under the `language` / `Language` key, with the value `en` or `it`. Anyone who already used version 1.2 or earlier, which was Italian only, keeps Italian after updating.
 
-**Mac: il menu dice "manca il permesso" anche se nell'elenco Accessibilità l'interruttore è attivo.**
-La voce nell'elenco appartiene a un'altra build di KeepMeOn, per esempio una compilata con un'altra firma, e riattivare l'interruttore non basta. Per sistemarla:
-1. Cancella la voce:
+## FAQ
+
+**Teams turned yellow anyway.**
+Open the menu and look at the status:
+- **"permission missing"** (Mac only): the Accessibility permission isn't on for this copy of the app (see below);
+- **"Paused":** at that moment KeepMeOn is right not to step in;
+- **"Off":** turn **Enabled** back on.
+
+**Mac: the menu says "permission missing" even though the switch is on in the Accessibility list.**
+The entry in the list belongs to another build of KeepMeOn, for example one built with a different signature, and turning the switch back on isn't enough. To fix it:
+1. Delete the entry:
 
    ```bash
    tccutil reset All com.keepmeon.app
    ```
 
-2. Esci da KeepMeOn e riaprila.
-3. Concedi di nuovo il permesso dal menu (**Concedi il permesso di Accessibilità…**).
+2. Quit KeepMeOn and open it again.
+3. Grant the permission again from the menu (**Grant Accessibility Permission…**).
 
-**Windows: all'avvio dell'installer compare «Windows ha protetto il PC».**
-Succede perché l'installer non è firmato con un certificato a pagamento. Clicca **Ulteriori informazioni** › **Esegui comunque**. Serve solo la prima volta.
+**Windows: when the installer starts, "Windows protected your PC" appears.**
+This happens because the installer isn't signed with a paid certificate. Click **More info** › **Run anyway**. It's only needed the first time.
 
-**Non vedo l'icona.**
-- **Mac:** può essere nascosta da un gestore della barra dei menu (Bartender, Ice, Thaw…) o dalla tacca dello schermo.
-- **Windows:** apri la freccia «Mostra icone nascoste» vicino all'orologio e trascina la tazzina sulla barra.
-- Se l'hai nascosta tu con **Nascondi icona…**, riapri KeepMeOn (Spotlight su Mac, menu Start su Windows).
+**How do I change the language?**
+From the menu, choose **Settings…** and pick the language at the top. You can also choose it on the first screen of the guided setup (**Guided Setup…**) and, on Windows, at the start of the installer.
 
-**Come verifico che funzioni?**
-- Nel menu, "Ultimo intervento" mostra l'ora dell'ultima azione.
-- Su Mac, per vedere ogni intervento in tempo reale:
+**I can't see the icon.**
+- **Mac:** it may be hidden by a menu bar manager (Bartender, Ice, Thaw…) or by the screen notch.
+- **Windows:** open the "Show hidden icons" arrow next to the clock and drag the cup onto the taskbar.
+- If you hid it yourself with **Hide Icon…**, open KeepMeOn again (Spotlight on Mac, Start menu on Windows).
+
+**How do I check that it works?**
+- In the menu, "Last action at…" shows the time of the last action.
+- On Mac, to see every action in real time:
 
   ```bash
   log stream --predicate 'subsystem == "com.keepmeon.app"' --level debug
   ```
 
-- Su Windows ogni intervento è scritto in `%LOCALAPPDATA%\KeepMeOn\keepmeon.log`.
+- On Windows every action is written to `%LOCALAPPDATA%\KeepMeOn\keepmeon.log`.
 
-**Come aggiorno KeepMeOn?**
-Dal menu dell'icona scegli **Controlla aggiornamenti…**; se c'è una nuova versione premi **Installa e riavvia**. Con **Aggiornamenti automatici** attivo, KeepMeOn controlla da sola una volta al giorno e ti avvisa. Se l'aggiornamento non riesce, puoi sempre scaricare l'ultima versione dalla pagina [Release](https://github.com/christianmusumeci00/KeepMeOn/releases/latest).
+**How do I update KeepMeOn?**
+From the icon menu choose **Check for Updates…**; if there's a new version, click **Install and Relaunch**. With **Automatic Updates** on, KeepMeOn checks on its own once a day and lets you know. If the update fails, you can always download the latest version from the [Releases](https://github.com/christianmusumeci00/KeepMeOn/releases/latest) page.
 
-**Il computer non si blocca più da solo.**
-È voluto: mentre KeepMeOn è attiva e non sei in pausa, il computer non va in stop per inattività. Quando ti allontani a lungo, bloccalo (⌃⌘Q su Mac, Windows+L su Windows).
+**The computer no longer locks on its own.**
+That's intended: while KeepMeOn is on and not paused, the computer doesn't sleep due to inactivity. When you step away for a long time, lock it (⌃⌘Q on Mac, Windows+L on Windows).
 
-## Limiti noti
+## Known limitations
 
-- Con lo schermo bloccato o il computer in stop Teams va comunque in «Assente». È voluto.
-- Lo stato impostato a mano in Teams, le riunioni e il calendario restano gestiti da Teams.
-- Se Microsoft cambia il modo in cui Teams misura l'inattività, il comportamento potrebbe cambiare.
-- Su Windows, se in primo piano c'è un programma avviato come amministratore, Windows può bloccare il segnale neutro (protezione UIPI) e Teams potrebbe andare in «Assente».
-- Se il computer è gestito dall'azienda, verifica che l'uso sia consentito; le regole dell'IT possono anche impedire di installare programmi. Per un controllo IT l'app resta visibile: processo attivo, avvio automatico e, su Mac, elenco Accessibilità.
+- With the screen locked or the computer asleep, Teams goes "Away" anyway. That's intended.
+- A status set manually in Teams, meetings and the calendar are still handled by Teams.
+- If Microsoft changes how Teams measures inactivity, the behavior may change.
+- On Windows, if a program started as administrator is in the foreground, Windows may block the neutral signal (UIPI protection) and Teams may go "Away".
+- If your computer is managed by your company, check that this use is allowed; IT rules may also prevent installing programs. For an IT check the app stays visible: running process, start at login and, on Mac, the Accessibility list.
 
-## Disinstallazione
+## Uninstalling
 
 ### Mac
 
-1. Dal menu disattiva **Avvia al login**, poi scegli **Esci**. Se l'icona è nascosta, riapri prima KeepMeOn per farla ricomparire.
-2. Sposta `KeepMeOn.app` nel Cestino.
-3. In Impostazioni di Sistema › Privacy e sicurezza › Accessibilità rimuovi KeepMeOn.
-4. Facoltativo, per cancellare le impostazioni:
+1. From the menu turn off **Launch at Login**, then choose **Quit**. If the icon is hidden, open KeepMeOn again first to bring it back.
+2. Move `KeepMeOn.app` to the Trash.
+3. In System Settings › Privacy & Security › Accessibility, remove KeepMeOn.
+4. Optional, to delete the settings:
 
    ```bash
    defaults delete com.keepmeon.app
@@ -343,37 +370,37 @@ Dal menu dell'icona scegli **Controlla aggiornamenti…**; se c'è una nuova ver
 
 ### Windows
 
-1. Vai in Impostazioni › App › App installate.
-2. Cerca **KeepMeOn** › **Disinstalla**.
+1. Go to Settings › Apps › Installed apps.
+2. Find **KeepMeOn** › **Uninstall**.
 
-La disinstallazione chiude l'app e toglie anche l'avvio automatico e le impostazioni.
+Uninstalling closes the app and also removes the startup entry and the settings.
 
-## Struttura del progetto
+## Project structure
 
 ```
 KeepMeOn/
-├── build.sh, make-dmg.sh       Mac: compilazione, firma, DMG e notarizzazione
+├── build.sh, make-dmg.sh       Mac: build, signing, DMG and notarization
 ├── Package.swift
 ├── Support/
-│   ├── Info.plist              bundle id, LSUIElement, versione, icona
+│   ├── Info.plist              bundle id, LSUIElement, version, icon
 │   ├── AppIcon.icns
-│   └── icon/make-icon.swift    disegna le icone per Mac e Windows
+│   └── icon/make-icon.swift    draws the icons for Mac and Windows
 ├── Sources/
-│   ├── KeepMeOnCore/           Mac: logica pura (orari, pausa pranzo, stato), coperta dai test
-│   └── KeepMeOn/               Mac: app per la barra dei menu (SwiftUI)
+│   ├── KeepMeOnCore/           Mac: pure logic (hours, lunch break, state, languages), covered by tests
+│   └── KeepMeOn/               Mac: menu bar app (SwiftUI)
 ├── Tests/KeepMeOnCoreTests/
 ├── windows/
-│   ├── src/KeepMeOn.Core/      Windows: la stessa logica pura in C#
-│   ├── src/KeepMeOn/           Windows: app per l'area di notifica (Windows Forms)
-│   ├── tests/                  test della logica (xUnit)
-│   ├── tools/KeepMeOn.Probe/   verifiche su Windows: segnale neutro e immagini
-│   └── installer/KeepMeOn.iss  installer (Inno Setup)
-├── .github/workflows/windows.yml   compilazione e verifiche su Windows
-└── docs/                       immagini del README
+│   ├── src/KeepMeOn.Core/      Windows: the same pure logic in C#
+│   ├── src/KeepMeOn/           Windows: notification area app (Windows Forms)
+│   ├── tests/                  tests for the logic (xUnit)
+│   ├── tools/KeepMeOn.Probe/   checks on Windows: neutral signal, pictures and installer
+│   └── installer/KeepMeOn.iss  installer (Inno Setup), in English and Italian
+├── .github/workflows/windows.yml   build and checks on Windows
+└── docs/                       README images
 ```
 
-## Licenza
+## License
 
 [MIT](LICENSE) © 2026 Christian Musumeci
 
-Microsoft Teams è un marchio di Microsoft Corporation. KeepMeOn è un progetto indipendente, non affiliato né approvato da Microsoft.
+Microsoft Teams is a trademark of Microsoft Corporation. KeepMeOn is an independent project, not affiliated with or endorsed by Microsoft.

@@ -7,67 +7,71 @@ struct MenuContent: View {
     @ObservedObject var controller: KeeperController
     @ObservedObject var loginItem: LoginItem
     @ObservedObject var updater: Updater
+    @ObservedObject var localization = Localization.shared
 
     var body: some View {
         Text(statusText)
         if controller.state == .active, let last = controller.lastDeclaration {
-            Text("Ultimo intervento alle \(last.formatted(date: .omitted, time: .shortened))")
+            Text(tr("Last action at \(last.formatted(date: .omitted, time: .shortened))",
+                     "Ultimo intervento alle \(last.formatted(date: .omitted, time: .shortened))"))
         }
         if !controller.hasEventAccess {
-            Button("Concedi il permesso di Accessibilità…") {
+            Button(tr("Grant Accessibility Permission…", "Concedi il permesso di Accessibilità…")) {
                 controller.requestEventAccess()
             }
         }
 
         Divider()
 
-        Toggle("Attivo", isOn: $controller.isEnabled)
-        Picker("Intervallo di controllo", selection: $controller.interval) {
+        Toggle(tr("Enabled", "Attivo"), isOn: $controller.isEnabled)
+        Picker(tr("Check Interval", "Intervallo di controllo"), selection: $controller.interval) {
             ForEach(KeeperController.intervalOptions, id: \.self) { seconds in
-                Text("\(seconds) secondi").tag(seconds)
+                Text(tr("\(seconds) seconds", "\(seconds) secondi")).tag(seconds)
             }
         }
 
         Divider()
 
-        Toggle("Solo in orario di lavoro", isOn: $controller.workHoursOnly)
+        Toggle(tr("Work Hours Only", "Solo in orario di lavoro"), isOn: $controller.workHoursOnly)
         if controller.workHoursOnly {
-            Text("Orario: \(controller.workHours.summary)")
+            Text(tr("Hours: ", "Orario: ") + controller.workHours.summary(in: localization.language))
         }
-        Toggle("Pausa pranzo", isOn: $controller.lunchBreakEnabled)
+        Toggle(tr("Lunch Break", "Pausa pranzo"), isOn: $controller.lunchBreakEnabled)
         if controller.lunchBreakEnabled {
-            Text("Pausa: \(controller.lunchBreak.summary)")
+            Text(tr("Break: ", "Pausa: ") + controller.lunchBreak.summary)
         }
-        Button("Imposta orari…") {
+        Button(tr("Settings…", "Impostazioni…")) {
             SettingsWindow.shared.show(controller: controller)
         }
 
         Divider()
 
-        Toggle("Avvia al login", isOn: Binding(
+        Toggle(tr("Launch at Login", "Avvia al login"), isOn: Binding(
             get: { loginItem.isEnabled },
             set: { loginItem.setEnabled($0) }
         ))
 
-        Button("Nascondi icona…") {
+        Button(tr("Hide Icon…", "Nascondi icona…")) {
             MenuBarIcon.confirmHide()
         }
-        Button("Configurazione guidata…") {
+        Button(tr("Guided Setup…", "Configurazione guidata…")) {
             OnboardingWindow.shared.show(controller: controller, loginItem: loginItem, updater: updater, fromStart: true)
         }
 
         Divider()
 
-        Button(updater.isBusy ? "Controllo aggiornamenti in corso…" : "Controlla aggiornamenti…") {
+        Button(updater.isBusy
+               ? tr("Checking for Updates…", "Controllo aggiornamenti in corso…")
+               : tr("Check for Updates…", "Controlla aggiornamenti…")) {
             updater.checkNow()
         }
         .disabled(updater.isBusy)
-        Toggle("Aggiornamenti automatici", isOn: $updater.automaticChecks)
+        Toggle(tr("Automatic Updates", "Aggiornamenti automatici"), isOn: $updater.automaticChecks)
         Text("KeepMeOn \(updater.currentVersion.description)")
 
         Divider()
 
-        Button("Esci") {
+        Button(tr("Quit", "Esci")) {
             NSApp.terminate(nil)
         }
         .keyboardShortcut("q")
@@ -75,13 +79,14 @@ struct MenuContent: View {
 
     private var statusText: String {
         switch controller.state {
-        case .off: "Disattivato"
-        case .active where !controller.hasEventAccess: "Attivo – manca il permesso, Teams può andare in Assente"
-        case .active: "Attivo – controllo ogni \(controller.interval) s"
-        case .pausedOutsideHours: "In pausa – fuori orario"
-        case .pausedLunch: "In pausa – pausa pranzo"
-        case .pausedScreenLocked: "In pausa – schermo bloccato"
-        case .pausedAsleep: "In pausa – Mac o schermo in stop"
+        case .off: tr("Off", "Disattivato")
+        case .active where !controller.hasEventAccess:
+            tr("Active – permission missing, Teams may go Away", "Attivo – manca il permesso, Teams può andare in Assente")
+        case .active: tr("Active – checking every \(controller.interval) s", "Attivo – controllo ogni \(controller.interval) s")
+        case .pausedOutsideHours: tr("Paused – outside work hours", "In pausa – fuori orario")
+        case .pausedLunch: tr("Paused – lunch break", "In pausa – pausa pranzo")
+        case .pausedScreenLocked: tr("Paused – screen locked", "In pausa – schermo bloccato")
+        case .pausedAsleep: tr("Paused – Mac or display asleep", "In pausa – Mac o schermo in stop")
         }
     }
 }

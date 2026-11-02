@@ -1,5 +1,8 @@
+using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using KeepMeOn.Core;
 
 namespace KeepMeOn
 {
@@ -31,6 +34,24 @@ namespace KeepMeOn
             ForeColor = color ?? SystemColors.ControlText,
             Margin = margin ?? new Padding(0, 2, 0, 0),
         };
+
+        /// <summary>«Language:» e la scelta della lingua: nelle impostazioni e nella configurazione guidata.</summary>
+        public static FlowLayoutPanel LanguagePicker(Padding margin)
+        {
+            var panel = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = margin };
+            panel.Controls.Add(new Label { Text = L10n.T("Language:", "Lingua:"), AutoSize = true, Margin = new Padding(0, 6, 6, 0) });
+            var choice = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 110, Margin = Padding.Empty };
+            choice.Items.AddRange(Languages.All.Select(language => (object)language.DisplayName()).ToArray());
+            choice.SelectedIndex = Languages.All.ToList().IndexOf(L10n.Current);
+            // Cambio rinviato: chi ascolta L10n.Changed ricostruisce la finestra, compresa questa casella.
+            choice.SelectedIndexChanged += (sender, e) =>
+            {
+                var language = Languages.All[choice.SelectedIndex];
+                choice.BeginInvoke((Action)(() => L10n.Set(language)));
+            };
+            panel.Controls.Add(choice);
+            return panel;
+        }
 
         public static Label Heading(string text, Font baseFont, Padding margin) => new Label
         {
