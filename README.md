@@ -135,7 +135,7 @@ On Mac it opens from the cup in the menu bar; on Windows with a click, left or r
 | Guided Setup… | Reopens the guided setup from the beginning |
 | Check for Updates… | Looks for a new version on GitHub right away |
 | Automatic Updates | Checks on its own once a day (on by default) |
-| KeepMeOn 1.2.0 | The installed version |
+| KeepMeOn 1.3.0 | The installed version |
 | Quit (Mac) / Exit (Windows) | Closes the app |
 
 ### Updates
