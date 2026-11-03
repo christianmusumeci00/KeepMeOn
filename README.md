@@ -81,6 +81,14 @@ If you're stepping away for longer, lock your computer (**⌃⌘Q** on Mac, **Wi
 
 A coffee cup appears in the menu bar.
 
+**With Homebrew.** Instead of steps 1 and 2, you can run:
+
+```bash
+brew install --cask christianmusumeci00/tap/keepmeon
+```
+
+Then continue from step 3. Updates still come from the app itself, as described in [Updates](#updates).
+
 ### Windows (Windows 10 and 11)
 
 1. Download **[KeepMeOn-Setup.exe](https://github.com/christianmusumeci00/KeepMeOn/releases/latest/download/KeepMeOn-Setup.exe)** and run it.
@@ -367,7 +375,7 @@ That's intended: while KeepMeOn is on and not paused, the computer doesn't sleep
 ### Mac
 
 1. From the menu turn off **Launch at Login**, then choose **Quit**. If the icon is hidden, open KeepMeOn again first to bring it back.
-2. Move `KeepMeOn.app` to the Trash.
+2. Move `KeepMeOn.app` to the Trash. If you installed it with Homebrew, run `brew uninstall --cask keepmeon` instead.
 3. In System Settings › Privacy & Security › Accessibility, remove KeepMeOn.
 4. Optional, to delete the settings:
 
