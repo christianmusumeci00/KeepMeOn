@@ -154,6 +154,13 @@ namespace KeepMeOn.Core
             return release.Asset(assetName);
         }
 
+        /// <summary>
+        /// Vero se la versione va proposta. Per una versione con «Non ricordarmelo più» il controllo
+        /// automatico tace; il controllo dal menu la mostra comunque. Una versione più recente si propone di nuovo.
+        /// </summary>
+        public static bool ShouldOffer(AppVersion version, AppVersion skipped, bool userInitiated) =>
+            userInitiated || skipped == null || version.CompareTo(skipped) > 0;
+
         /// <summary>Vero se è ora di un controllo automatico.</summary>
         public static bool IsCheckDue(DateTime? lastCheck, DateTime now) =>
             lastCheck == null || now - lastCheck.Value >= AutomaticCheckInterval || now < lastCheck.Value;

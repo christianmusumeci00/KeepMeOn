@@ -55,6 +55,15 @@ final class UpdatesTests: XCTestCase {
         XCTAssertNil(UpdatePolicy.availableUpdate(in: release, current: AppVersion("1.1.0")!, assetName: "altro.zip"))
     }
 
+    func testSkippedVersionIsOfferedOnlyByHandOrWhenNewer() {
+        let v130 = AppVersion("1.3.0")!
+        XCTAssertTrue(UpdatePolicy.shouldOffer(v130, skipped: nil, userInitiated: false))
+        XCTAssertFalse(UpdatePolicy.shouldOffer(v130, skipped: v130, userInitiated: false))
+        XCTAssertTrue(UpdatePolicy.shouldOffer(v130, skipped: v130, userInitiated: true))
+        XCTAssertTrue(UpdatePolicy.shouldOffer(AppVersion("1.3.1")!, skipped: v130, userInitiated: false))
+        XCTAssertFalse(UpdatePolicy.shouldOffer(AppVersion("1.2.9")!, skipped: v130, userInitiated: false))
+    }
+
     func testCheckIsDueOncePerDay() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
         XCTAssertTrue(UpdatePolicy.isCheckDue(lastCheck: nil, now: now))

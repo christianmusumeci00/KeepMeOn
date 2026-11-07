@@ -103,6 +103,13 @@ namespace KeepMeOn
             set => SetString("LastUpdateCheck", value?.ToString("o", CultureInfo.InvariantCulture) ?? "");
         }
 
+        /// <summary>Versione per cui si è scelto «Non ricordarmelo più».</summary>
+        public AppVersion SkippedUpdateVersion
+        {
+            get => AppVersion.Parse(GetString("SkippedUpdateVersion"));
+            set => SetString("SkippedUpdateVersion", value?.ToString() ?? "");
+        }
+
         /// <summary>Solo per le prove: indirizzo alternativo della release (anche file:///…).</summary>
         public string UpdateFeedUrl => GetString("UpdateFeedUrl");
 

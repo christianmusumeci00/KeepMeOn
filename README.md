@@ -155,7 +155,7 @@ On Mac it opens from the cup in the menu bar; on Windows with a click, left or r
 
 ### Updates
 
-When a new version is available, KeepMeOn asks whether to install it: **Install and Relaunch** downloads it, installs it and reopens the app on its own. Settings, language and permissions are kept; **What's New…** (on Windows "Read what's new") shows what changed.
+When a new version is available, KeepMeOn asks whether to install it: **Install and Relaunch** downloads it, installs it and reopens the app on its own. Settings, language and permissions are kept; **What's New…** (on Windows "Read what's new") shows what changed. **Don't Remind Me Again** skips that version: the automatic check stays quiet about it until a newer one comes out, while **Check for Updates…** still offers it.
 
 - **Mac:** before installing, KeepMeOn checks that the new app is signed by the same developer as the one in use; if it isn't, the update is rejected. KeepMeOn must be able to write to the folder it's in, for example Applications.
 - **Windows:** the new version's installer runs without windows and keeps your choices for startup at sign-in and language.

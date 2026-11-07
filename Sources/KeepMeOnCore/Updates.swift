@@ -89,6 +89,13 @@ public enum UpdatePolicy {
         return release.asset(named: assetName)
     }
 
+    /// Vero se la versione va proposta. Per una versione con «Non ricordarmelo più» il controllo
+    /// automatico tace; il controllo dal menu la mostra comunque. Una versione più recente si propone di nuovo.
+    public static func shouldOffer(_ version: AppVersion, skipped: AppVersion?, userInitiated: Bool) -> Bool {
+        guard !userInitiated, let skipped else { return true }
+        return version > skipped
+    }
+
     /// Vero se è ora di un controllo automatico.
     public static func isCheckDue(lastCheck: Date?, now: Date) -> Bool {
         guard let lastCheck else { return true }

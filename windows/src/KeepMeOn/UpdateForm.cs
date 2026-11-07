@@ -6,7 +6,7 @@ using KeepMeOn.Core;
 
 namespace KeepMeOn
 {
-    /// <summary>Finestra «È disponibile KeepMeOn x.y.z»: novità, «Installa e riavvia», «Più tardi».</summary>
+    /// <summary>Finestra «È disponibile KeepMeOn x.y.z»: novità, «Installa e riavvia», «Più tardi», «Non ricordarmelo più».</summary>
     internal sealed class UpdateForm : Form
     {
         private const int ContentWidth = 400;
@@ -17,6 +17,7 @@ namespace KeepMeOn
         private readonly Label status;
         private readonly Button install;
         private readonly Button later;
+        private readonly Button skip;
 
         public UpdateForm(Updater updater, ReleaseInfo release, ReleaseAsset asset)
         {
@@ -77,9 +78,12 @@ namespace KeepMeOn
             };
             install = new Button { Text = L10n.T("Install and restart", "Installa e riavvia"), AutoSize = true, Padding = new Padding(8, 2, 8, 2) };
             later = new Button { Text = L10n.T("Later", "Più tardi"), AutoSize = true, Padding = new Padding(8, 2, 8, 2), DialogResult = DialogResult.Cancel };
+            // Chiude la finestra con DialogResult.Ignore: il controllo automatico non propone più questa versione.
+            skip = new Button { Text = L10n.T("Don't remind me again", "Non ricordarmelo più"), AutoSize = true, Padding = new Padding(8, 2, 8, 2), DialogResult = DialogResult.Ignore };
             install.Click += async (sender, e) => await InstallAsync();
             buttons.Controls.Add(install);
             buttons.Controls.Add(later);
+            buttons.Controls.Add(skip);
             content.Controls.Add(buttons);
             AcceptButton = install;
             CancelButton = later;
@@ -91,7 +95,7 @@ namespace KeepMeOn
 
         private async System.Threading.Tasks.Task InstallAsync()
         {
-            install.Enabled = later.Enabled = false;
+            install.Enabled = later.Enabled = skip.Enabled = false;
             ControlBox = false;
             progressBar.Visible = status.Visible = true;
             status.Text = L10n.T("Downloading the update…", "Download dell'aggiornamento…");

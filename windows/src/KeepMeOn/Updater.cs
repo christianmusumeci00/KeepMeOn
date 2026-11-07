@@ -102,10 +102,24 @@ namespace KeepMeOn
                     return;
                 }
 
+                if (!UpdatePolicy.ShouldOffer(release.Version, settings.SkippedUpdateVersion, userInitiated))
+                {
+                    Log.Write($"Versione {release.Version} disponibile, ma da non ricordare");
+                    return;
+                }
                 Log.Write($"Disponibile la versione {release.Version}");
                 using (var form = new UpdateForm(this, release, asset))
                 {
-                    form.ShowDialog();
+                    switch (form.ShowDialog())
+                    {
+                        case DialogResult.Ignore:
+                            settings.SkippedUpdateVersion = release.Version;
+                            Log.Write($"Non ricordare più la versione {release.Version}");
+                            break;
+                        case DialogResult.OK:
+                            settings.SkippedUpdateVersion = null;
+                            break;
+                    }
                 }
             }
             catch (Exception error)

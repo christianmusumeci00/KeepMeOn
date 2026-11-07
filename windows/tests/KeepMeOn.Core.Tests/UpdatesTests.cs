@@ -70,6 +70,16 @@ namespace KeepMeOn.Core.Tests
         }
 
         [Fact]
+        public void SkippedVersionIsOfferedOnlyByHandOrWhenNewer()
+        {
+            Assert.True(UpdatePolicy.ShouldOffer(V("1.3.0"), null, userInitiated: false));
+            Assert.False(UpdatePolicy.ShouldOffer(V("1.3.0"), V("1.3.0"), userInitiated: false));
+            Assert.True(UpdatePolicy.ShouldOffer(V("1.3.0"), V("1.3.0"), userInitiated: true));
+            Assert.True(UpdatePolicy.ShouldOffer(V("1.3.1"), V("1.3.0"), userInitiated: false));
+            Assert.False(UpdatePolicy.ShouldOffer(V("1.2.9"), V("1.3.0"), userInitiated: false));
+        }
+
+        [Fact]
         public void CheckIsDueOncePerDay()
         {
             var now = new DateTime(2026, 10, 30, 15, 0, 0);

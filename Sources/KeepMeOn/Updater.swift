@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 import KeepMeOnCore
 import Security
 import SwiftUI
@@ -19,6 +20,8 @@ final class Updater: NSObject, ObservableObject {
     private enum Keys {
         static let automaticChecks = "automaticUpdateChecks"
         static let lastCheck = "lastUpdateCheck"
+        /// Versione per cui si è scelto «Non ricordarmelo più».
+        static let skippedVersion = "skippedUpdateVersion"
         /// Solo per le prove: `defaults write com.keepmeon.app updateFeedURL file:///percorso/release.json`
         static let feedURL = "updateFeedURL"
     }
@@ -118,9 +121,21 @@ final class Updater: NSObject, ObservableObject {
                 if userInitiated { showUpToDate() }
                 return
             }
+            let skipped = defaults.string(forKey: Keys.skippedVersion).flatMap { AppVersion($0) }
+            guard UpdatePolicy.shouldOffer(version, skipped: skipped, userInitiated: userInitiated) else {
+                Log.updater.info("Versione \(version.description, privacy: .public) disponibile, ma da non ricordare")
+                return
+            }
             Log.updater.info("Disponibile la versione \(version.description, privacy: .public)")
-            if askToInstall(version: version, release: release) {
+            switch askToInstall(version: version, release: release) {
+            case .install:
+                defaults.removeObject(forKey: Keys.skippedVersion)
                 try await install(asset: asset, version: version)
+            case .skip:
+                defaults.set(version.description, forKey: Keys.skippedVersion)
+                Log.updater.info("Non ricordare più la versione \(version.description, privacy: .public)")
+            case .later:
+                break
             }
         } catch {
             Log.updater.error("Aggiornamento: \(error.localizedDescription, privacy: .public)")
@@ -146,7 +161,7 @@ final class Updater: NSObject, ObservableObject {
     // MARK: Installazione
 
     private func install(asset: ReleaseInfo.Asset, version: AppVersion) async throws {
-        let bundle = Bundle.main.bundleURL
+        let bundle = Self.installedBundleURL()
         let folder = bundle.deletingLastPathComponent()
         guard FileManager.default.isWritableFile(atPath: folder.path) else {
             throw UpdateError.notWritable(folder.path)
@@ -168,6 +183,29 @@ final class Updater: NSObject, ObservableObject {
         relaunch(replacing: bundle, with: staged)
     }
 
+    /// Dove si trova davvero l'app. Un'app scaricata e aperta senza passare dal Finder (ancora
+    /// "in quarantena") viene avviata da macOS da una copia temporanea in sola lettura,
+    /// in …/AppTranslocation/…: l'aggiornamento va scritto al posto dell'originale.
+    nonisolated static func installedBundleURL() -> URL {
+        let running = Bundle.main.bundleURL
+        guard running.path.contains("/AppTranslocation/") else { return running }
+        if let original = translocationOriginal(of: running) {
+            return original
+        }
+        let applications = URL(fileURLWithPath: "/Applications/KeepMeOn.app")
+        return FileManager.default.fileExists(atPath: applications.path) ? applications : running
+    }
+
+    /// `SecTranslocateCreateOriginalPathForURL` esiste nel framework Security, ma non negli header pubblici.
+    nonisolated private static func translocationOriginal(of url: URL) -> URL? {
+        typealias OriginalPath = @convention(c) (CFURL, UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Unmanaged<CFURL>?
+        guard let security = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY),
+              let symbol = dlsym(security, "SecTranslocateCreateOriginalPathForURL")
+        else { return nil }
+        let originalPath = unsafeBitCast(symbol, to: OriginalPath.self)
+        return originalPath(url as CFURL, nil)?.takeRetainedValue() as URL?
+    }
+
     /// Monta il DMG, verifica la firma della nuova app e la copia accanto a quella in uso.
     /// Restituisce il percorso della copia, pronta a prendere il posto dell'app attuale.
     nonisolated private static func stage(dmg: URL, nextTo bundle: URL) throws -> URL {
@@ -186,6 +224,9 @@ final class Updater: NSObject, ObservableObject {
         let staged = bundle.deletingLastPathComponent().appendingPathComponent(".KeepMeOn-aggiornamento.app")
         try? FileManager.default.removeItem(at: staged)
         try run("/usr/bin/ditto", [newApp.path, staged.path])
+        // La firma è verificata: senza la quarantena la nuova copia si apre dal suo posto,
+        // non da una copia temporanea, e anche l'aggiornamento successivo può sostituirla.
+        try? run("/usr/bin/xattr", ["-dr", "com.apple.quarantine", staged.path])
         return staged
     }
 
@@ -243,7 +284,11 @@ final class Updater: NSObject, ObservableObject {
 
     // MARK: Finestre e avvisi
 
-    private func askToInstall(version: AppVersion, release: ReleaseInfo) -> Bool {
+    private enum Answer {
+        case install, later, skip
+    }
+
+    private func askToInstall(version: AppVersion, release: ReleaseInfo) -> Answer {
         while true {
             let alert = NSAlert()
             alert.messageText = tr("KeepMeOn \(version.description) is available", "È disponibile KeepMeOn \(version.description)")
@@ -253,14 +298,17 @@ final class Updater: NSObject, ObservableObject {
             alert.addButton(withTitle: tr("Install and Relaunch", "Installa e riavvia"))
             alert.addButton(withTitle: tr("Later", "Più tardi"))
             alert.addButton(withTitle: tr("What's New…", "Novità…"))
+            alert.addButton(withTitle: tr("Don't Remind Me Again", "Non ricordarmelo più"))
             NSApp.activateIgnoringOtherAppsIfNeeded()
             switch alert.runModal() {
             case .alertFirstButtonReturn:
-                return true
+                return .install
             case .alertThirdButtonReturn:
                 NSWorkspace.shared.open(release.pageURL)
+            case NSApplication.ModalResponse(rawValue: NSApplication.ModalResponse.alertThirdButtonReturn.rawValue + 1):
+                return .skip
             default:
-                return false
+                return .later
             }
         }
     }
